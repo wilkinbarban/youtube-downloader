@@ -52,23 +52,22 @@ Aplicación de escritorio para Windows creada con Python y PyQt6 para gestionar 
 - Conexión a Internet.
 - Winget recomendado para instalación automática de Python/FFmpeg.
 
-### Instalación rápida
 ### Instalación con un solo comando (PowerShell)
 
 **Opción A — Ya tienes el repositorio clonado o descargado:**
 ```powershell
-Set-ExecutionPolicy -Scope Process Bypass; .\install.ps1
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force; .\install.ps1
 ```
 
 **Opción A2 — No tienes el repositorio (bootstrap directo con install.ps1):**
 ```powershell
-Set-ExecutionPolicy -Scope Process Bypass; irm https://raw.githubusercontent.com/wilkinbarban/youtube-downloader/main/install.ps1 | iex
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force; irm https://raw.githubusercontent.com/wilkinbarban/youtube-downloader/main/install.ps1 | iex
 ```
 > `install.ps1` ahora detecta si faltan archivos del proyecto y, en ese caso, descarga el repo automáticamente al Escritorio (`%USERPROFILE%\Desktop\youtube-downloader`) antes de continuar con la instalación.
 
 **Opción B — Instalación remota directa desde GitHub (sin clonar nada):**
 ```powershell
-Set-ExecutionPolicy -Scope Process Bypass; irm https://raw.githubusercontent.com/wilkinbarban/youtube-downloader/main/install_secure.ps1 | iex
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force; irm https://raw.githubusercontent.com/wilkinbarban/youtube-downloader/main/install_secure.ps1 | iex
 ```
 > `install_secure.ps1` descarga el repositorio al Escritorio por defecto (`%USERPROFILE%\Desktop\youtube-downloader`), verifica la integridad del archivo y delega en `install.ps1` localmente. Nunca ejecuta código remoto directamente.
 
@@ -101,23 +100,22 @@ Windows desktop application built with Python and PyQt6 to manage YouTube downlo
 - Internet connection.
 - Winget recommended for automatic Python/FFmpeg installation.
 
-### Quick start
 ### One-command install (PowerShell)
 
 **Option A — You already have the repository cloned or downloaded:**
 ```powershell
-Set-ExecutionPolicy -Scope Process Bypass; .\install.ps1
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force; .\install.ps1
 ```
 
 **Option A2 — You do not have the repository yet (direct bootstrap with install.ps1):**
 ```powershell
-Set-ExecutionPolicy -Scope Process Bypass; irm https://raw.githubusercontent.com/wilkinbarban/youtube-downloader/main/install.ps1 | iex
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force; irm https://raw.githubusercontent.com/wilkinbarban/youtube-downloader/main/install.ps1 | iex
 ```
 > `install.ps1` now detects missing project files and automatically downloads the repo to Desktop (`%USERPROFILE%\Desktop\youtube-downloader`) before continuing installation.
 
 **Option B — Remote install directly from GitHub (no cloning required):**
 ```powershell
-Set-ExecutionPolicy -Scope Process Bypass; irm https://raw.githubusercontent.com/wilkinbarban/youtube-downloader/main/install_secure.ps1 | iex
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force; irm https://raw.githubusercontent.com/wilkinbarban/youtube-downloader/main/install_secure.ps1 | iex
 ```
 > `install_secure.ps1` downloads the repository to Desktop by default (`%USERPROFILE%\Desktop\youtube-downloader`), verifies the archive, and delegates to the local `install.ps1`. It never executes arbitrary remote code directly.
 
@@ -150,23 +148,22 @@ Aplicativo desktop para Windows, desenvolvido com Python e PyQt6, para gerenciar
 - Conexão com a Internet.
 - Winget recomendado para instalação automática de Python/FFmpeg.
 
-### Início rápido
 ### Instalação com um único comando (PowerShell)
 
 **Opção A — Você já tem o repositório clonado ou baixado:**
 ```powershell
-Set-ExecutionPolicy -Scope Process Bypass; .\install.ps1
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force; .\install.ps1
 ```
 
 **Opção A2 — Você ainda não tem o repositório (bootstrap direto com install.ps1):**
 ```powershell
-Set-ExecutionPolicy -Scope Process Bypass; irm https://raw.githubusercontent.com/wilkinbarban/youtube-downloader/main/install.ps1 | iex
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force; irm https://raw.githubusercontent.com/wilkinbarban/youtube-downloader/main/install.ps1 | iex
 ```
 > `install.ps1` agora detecta ausência dos arquivos do projeto e baixa o repositório automaticamente para a Área de Trabalho (`%USERPROFILE%\Desktop\youtube-downloader`) antes de continuar.
 
 **Opção B — Instalação remota diretamente do GitHub (sem clonar):**
 ```powershell
-Set-ExecutionPolicy -Scope Process Bypass; irm https://raw.githubusercontent.com/wilkinbarban/youtube-downloader/main/install_secure.ps1 | iex
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force; irm https://raw.githubusercontent.com/wilkinbarban/youtube-downloader/main/install_secure.ps1 | iex
 ```
 > `install_secure.ps1` baixa o repositório para a Área de Trabalho por padrão (`%USERPROFILE%\Desktop\youtube-downloader`), verifica a integridade do arquivo e delega para o `install.ps1` local. Nunca executa código remoto diretamente.
 
@@ -177,8 +174,6 @@ Set-ExecutionPolicy -Scope Process Bypass; irm https://raw.githubusercontent.com
 
 ### Dependência FFmpeg
 Se o FFmpeg não estiver instalado, o aplicativo pode oferecer instalação automática no Windows via winget.
-
----
 
 ---
 
