@@ -33,6 +33,16 @@
 
 ---
 
+## Public roadmap
+
+Project roadmap is available in [ROADMAP.md](ROADMAP.md) with planned milestones for:
+
+- `1.1.0` Reliability and quality automation
+- `1.2.0` Distribution and onboarding
+- `2.0.0` Product maturity and extensibility
+
+---
+
 ## Capturas de interfaz / Interface Screenshots / Capturas da interface
 
 Vista principal de la aplicación · Main application view · Tela principal do aplicativo
@@ -219,6 +229,9 @@ Se o projeto for útil para você, seu apoio ajuda a manter e melhorar o aplicat
 | `install_secure.ps1` | Secure remote installer: downloads repo from GitHub, verifies, then runs install.ps1 |
 | `requirements.txt` | Python dependencies with version policy |
 | `assets/` | Icons and visual resources |
+| `.github/workflows/ci.yml` | CI pipeline for dependency install and Python compile checks |
+| `.github/workflows/release-build.yml` | Windows `.exe` build and auto-attach to GitHub Releases |
+| `ROADMAP.md` | Public roadmap for versions 1.1.0, 1.2.0 and 2.0.0 |
 
 ---
 
