@@ -53,9 +53,23 @@ Aplicación de escritorio para Windows creada con Python y PyQt6 para gestionar 
 - Winget recomendado para instalación automática de Python/FFmpeg.
 
 ### Instalación rápida
+### Instalación con un solo comando (PowerShell)
+
+**Opción A — Ya tienes el repositorio clonado o descargado:**
+```powershell
+Set-ExecutionPolicy -Scope Process Bypass; .\install.ps1
+```
+
+**Opción B — Instalación remota directa desde GitHub (sin clonar nada):**
+```powershell
+Set-ExecutionPolicy -Scope Process Bypass; irm https://raw.githubusercontent.com/wilkinbarban/youtube-downloader/main/install_secure.ps1 | iex
+```
+> `install_secure.ps1` descarga el repositorio, verifica la integridad del archivo y delega en `install.ps1` localmente. Nunca ejecuta código remoto directamente.
+
+### Instalación rápida (alternativa clásica)
 1. Clona o descarga el repositorio.
-2. Ejecuta Iniciar.bat.
-3. El script valida Python, crea .venv, instala dependencias y abre la app.
+2. Ejecuta `Iniciar.bat`.
+3. El script valida Python, crea `.venv`, instala dependencias y abre la app.
 
 ### Dependencia FFmpeg
 Si FFmpeg no está instalado, la aplicación puede ofrecer instalarlo automáticamente en Windows usando winget.
@@ -82,9 +96,23 @@ Windows desktop application built with Python and PyQt6 to manage YouTube downlo
 - Winget recommended for automatic Python/FFmpeg installation.
 
 ### Quick start
+### One-command install (PowerShell)
+
+**Option A — You already have the repository cloned or downloaded:**
+```powershell
+Set-ExecutionPolicy -Scope Process Bypass; .\install.ps1
+```
+
+**Option B — Remote install directly from GitHub (no cloning required):**
+```powershell
+Set-ExecutionPolicy -Scope Process Bypass; irm https://raw.githubusercontent.com/wilkinbarban/youtube-downloader/main/install_secure.ps1 | iex
+```
+> `install_secure.ps1` downloads the repository over HTTPS, verifies the archive, and delegates to the local `install.ps1`. It never executes arbitrary remote code directly.
+
+### Quick start (classic alternative)
 1. Clone or download the repository.
-2. Run Iniciar.bat.
-3. The script validates Python, creates .venv, installs dependencies, and launches the app.
+2. Run `Iniciar.bat`.
+3. The script validates Python, creates `.venv`, installs dependencies, and launches the app.
 
 ### FFmpeg dependency
 If FFmpeg is missing, the app can prompt an automatic installation on Windows through winget.
@@ -111,9 +139,23 @@ Aplicativo desktop para Windows, desenvolvido com Python e PyQt6, para gerenciar
 - Winget recomendado para instalação automática de Python/FFmpeg.
 
 ### Início rápido
+### Instalação com um único comando (PowerShell)
+
+**Opção A — Você já tem o repositório clonado ou baixado:**
+```powershell
+Set-ExecutionPolicy -Scope Process Bypass; .\install.ps1
+```
+
+**Opção B — Instalação remota diretamente do GitHub (sem clonar):**
+```powershell
+Set-ExecutionPolicy -Scope Process Bypass; irm https://raw.githubusercontent.com/wilkinbarban/youtube-downloader/main/install_secure.ps1 | iex
+```
+> `install_secure.ps1` baixa o repositório via HTTPS, verifica a integridade do arquivo e delega para o `install.ps1` local. Nunca executa código remoto diretamente.
+
+### Início rápido (alternativa clássica)
 1. Clone ou baixe o repositório.
-2. Execute Iniciar.bat.
-3. O script valida o Python, cria o .venv, instala as dependências e inicia o aplicativo.
+2. Execute `Iniciar.bat`.
+3. O script valida o Python, cria o `.venv`, instala as dependências e inicia o aplicativo.
 
 ### Dependência FFmpeg
 Se o FFmpeg não estiver instalado, o aplicativo pode oferecer instalação automática no Windows via winget.
@@ -136,6 +178,8 @@ Se o FFmpeg não estiver instalado, o aplicativo pode oferecer instalação auto
 | `app_logging.py` | Logging utilities |
 | `app_paths.py` | Shared path helpers |
 | `Iniciar.bat` | Windows bootstrap: validates Python, creates venv, installs deps, launches app |
+| `install.ps1` | PowerShell installer: same flow as Iniciar.bat, scriptable and pipeable |
+| `install_secure.ps1` | Secure remote installer: downloads repo from GitHub, verifies, then runs install.ps1 |
 | `requirements.txt` | Python dependencies with version policy |
 | `assets/` | Icons and visual resources |
 | `.github/workflows/ci.yml` | CI pipeline (syntax check, Python version guard) |

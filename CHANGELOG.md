@@ -7,6 +7,11 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+### Added
+- `install.ps1`: PowerShell one-command installer and launcher for Windows (replaces double-clicking `Iniciar.bat` in scripted workflows).
+- `install_secure.ps1`: Secure remote installer — downloads the repo from GitHub over HTTPS, verifies integrity, and delegates to local `install.ps1`. Supports `irm ... | iex` one-liner.
+
+### Planned
 - Screenshots and visual documentation.
 - Packaged `.exe` release (PyInstaller).
 
