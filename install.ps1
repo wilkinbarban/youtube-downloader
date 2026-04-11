@@ -27,6 +27,7 @@
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -43,6 +44,82 @@ Write-Host "  YouTube Downloader - Installer / Launcher (Windows)" -ForegroundCo
 Write-Host "  Educational project - GPL-3.0 License" -ForegroundColor Cyan
 Write-Host "=======================================================" -ForegroundColor Cyan
 Write-Host ""
+
+# ---------------------------------------------------------------------------
+# Bootstrap mode: if this script is executed outside the project root,
+# download/update the repository first and then delegate to local install.
+# ---------------------------------------------------------------------------
+$RequiredFiles = @('youtube_downloader.py', 'requirements.txt')
+$IsProjectRoot = $true
+foreach ($file in $RequiredFiles) {
+    if (-not (Test-Path (Join-Path $PSScriptRoot $file))) {
+        $IsProjectRoot = $false
+        break
+    }
+}
+
+if (-not $IsProjectRoot) {
+    Write-Warn "Project files were not found next to install.ps1."
+    Write-Info "Switching to bootstrap mode: downloading repository from GitHub..."
+
+    $RepoOwner   = 'wilkinbarban'
+    $RepoName    = 'youtube-downloader'
+    $Branch      = 'main'
+    $ArchiveUrl  = "https://github.com/$RepoOwner/$RepoName/archive/refs/heads/$Branch.zip"
+    $DesktopDir  = [Environment]::GetFolderPath('Desktop')
+    if ([string]::IsNullOrWhiteSpace($DesktopDir)) {
+        $DesktopDir = Join-Path $HOME 'Desktop'
+    }
+    $InstallDir  = if ($env:YTD_INSTALL_DIR) { $env:YTD_INSTALL_DIR } else { Join-Path $DesktopDir $RepoName }
+    $TempZip     = Join-Path $env:TEMP "$RepoName-$Branch.zip"
+    $TempExtract = Join-Path $env:TEMP "$RepoName-bootstrap-$(Get-Random)"
+
+    Write-Step "Downloading repository archive..."
+    Invoke-WebRequest -Uri $ArchiveUrl -OutFile $TempZip -UseBasicParsing
+
+    $zipSize = (Get-Item $TempZip).Length
+    if ($zipSize -lt 1024) {
+        Write-Fail "Downloaded archive appears invalid (size: $zipSize bytes)."
+        Remove-Item -Force $TempZip -ErrorAction SilentlyContinue
+        exit 1
+    }
+
+    Write-Step "Extracting repository archive..."
+    $null = New-Item -ItemType Directory -Path $TempExtract -Force
+    Expand-Archive -Path $TempZip -DestinationPath $TempExtract -Force
+    Remove-Item -Force $TempZip -ErrorAction SilentlyContinue
+
+    $ExtractedRoot = Join-Path $TempExtract "$RepoName-$Branch"
+    if (-not (Test-Path $ExtractedRoot)) {
+        Write-Fail "Expected folder '$ExtractedRoot' not found after extraction."
+        Remove-Item -Recurse -Force $TempExtract -ErrorAction SilentlyContinue
+        exit 1
+    }
+
+    Write-Step "Installing repository to: $InstallDir"
+    if (Test-Path $InstallDir) {
+        Write-Warn "Target already exists. Updating in-place (existing .venv preserved)."
+        Get-ChildItem -Path $ExtractedRoot | Where-Object { $_.Name -ne '.venv' } | ForEach-Object {
+            $dest = Join-Path $InstallDir $_.Name
+            Copy-Item -Path $_.FullName -Destination $dest -Recurse -Force
+        }
+    } else {
+        Move-Item -Path $ExtractedRoot -Destination $InstallDir
+    }
+
+    Remove-Item -Recurse -Force $TempExtract -ErrorAction SilentlyContinue
+
+    $LocalInstaller = Join-Path $InstallDir 'install.ps1'
+    if (-not (Test-Path $LocalInstaller)) {
+        Write-Fail "install.ps1 not found in $InstallDir after bootstrap."
+        exit 1
+    }
+
+    Write-Ok "Repository ready. Delegating to local installer..."
+    Set-Location $InstallDir
+    & $LocalInstaller
+    exit $LASTEXITCODE
+}
 
 # ---------------------------------------------------------------------------
 # 1. Locate a compatible Python runtime (>=3.8, <3.14; prefer 3.11)

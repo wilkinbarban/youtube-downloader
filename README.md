@@ -60,6 +60,12 @@ Aplicación de escritorio para Windows creada con Python y PyQt6 para gestionar 
 Set-ExecutionPolicy -Scope Process Bypass; .\install.ps1
 ```
 
+**Opción A2 — No tienes el repositorio (bootstrap directo con install.ps1):**
+```powershell
+Set-ExecutionPolicy -Scope Process Bypass; irm https://raw.githubusercontent.com/wilkinbarban/youtube-downloader/main/install.ps1 | iex
+```
+> `install.ps1` ahora detecta si faltan archivos del proyecto y, en ese caso, descarga el repo automáticamente al Escritorio (`%USERPROFILE%\Desktop\youtube-downloader`) antes de continuar con la instalación.
+
 **Opción B — Instalación remota directa desde GitHub (sin clonar nada):**
 ```powershell
 Set-ExecutionPolicy -Scope Process Bypass; irm https://raw.githubusercontent.com/wilkinbarban/youtube-downloader/main/install_secure.ps1 | iex
@@ -103,6 +109,12 @@ Windows desktop application built with Python and PyQt6 to manage YouTube downlo
 Set-ExecutionPolicy -Scope Process Bypass; .\install.ps1
 ```
 
+**Option A2 — You do not have the repository yet (direct bootstrap with install.ps1):**
+```powershell
+Set-ExecutionPolicy -Scope Process Bypass; irm https://raw.githubusercontent.com/wilkinbarban/youtube-downloader/main/install.ps1 | iex
+```
+> `install.ps1` now detects missing project files and automatically downloads the repo to Desktop (`%USERPROFILE%\Desktop\youtube-downloader`) before continuing installation.
+
 **Option B — Remote install directly from GitHub (no cloning required):**
 ```powershell
 Set-ExecutionPolicy -Scope Process Bypass; irm https://raw.githubusercontent.com/wilkinbarban/youtube-downloader/main/install_secure.ps1 | iex
@@ -145,6 +157,12 @@ Aplicativo desktop para Windows, desenvolvido com Python e PyQt6, para gerenciar
 ```powershell
 Set-ExecutionPolicy -Scope Process Bypass; .\install.ps1
 ```
+
+**Opção A2 — Você ainda não tem o repositório (bootstrap direto com install.ps1):**
+```powershell
+Set-ExecutionPolicy -Scope Process Bypass; irm https://raw.githubusercontent.com/wilkinbarban/youtube-downloader/main/install.ps1 | iex
+```
+> `install.ps1` agora detecta ausência dos arquivos do projeto e baixa o repositório automaticamente para a Área de Trabalho (`%USERPROFILE%\Desktop\youtube-downloader`) antes de continuar.
 
 **Opção B — Instalação remota diretamente do GitHub (sem clonar):**
 ```powershell
