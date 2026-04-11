@@ -29,11 +29,27 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
-# When this script is executed via "irm ... | iex", $PSScriptRoot can be empty.
-# Use current location as a safe fallback so path operations never receive an empty string.
-$ScriptRoot = $PSScriptRoot
+# Resolve a safe base path for all file operations.
+# In "irm ... | iex" execution contexts, $PSScriptRoot and $PSCommandPath
+# may be empty, so we fall back to current location and finally '.'
+$ScriptRootCandidates = @(
+    $PSScriptRoot,
+    $(if (-not [string]::IsNullOrWhiteSpace($PSCommandPath)) { Split-Path -Parent $PSCommandPath }),
+    (Get-Location).Path,
+    '.'
+)
+
+$ScriptRoot = $null
+foreach ($candidate in $ScriptRootCandidates) {
+    if (-not [string]::IsNullOrWhiteSpace($candidate)) {
+        $ScriptRoot = $candidate.Trim()
+        break
+    }
+}
+
 if ([string]::IsNullOrWhiteSpace($ScriptRoot)) {
-    $ScriptRoot = (Get-Location).Path
+    Write-Fail "Unable to resolve a valid working directory for installation."
+    exit 1
 }
 
 # ---------------------------------------------------------------------------
