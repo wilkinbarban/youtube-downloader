@@ -74,6 +74,14 @@ Aplicación de escritorio para Windows creada con Python y PyQt6 para gestionar 
 - Conexión a Internet.
 - Winget recomendado para instalación automática de Python/FFmpeg.
 
+### Método recomendado (prueba y ejecución rápida)
+
+Para la forma más rápida de probar y ejecutar la aplicación en Windows, descarga el último ejecutable oficial:
+
+- **Descarga directa (.exe):** [Latest release - YouTubeDownloader.exe](https://github.com/wilkinbarban/youtube-downloader/releases/latest/download/YouTubeDownloader.exe)
+
+Los métodos por consola de esta sección se mantienen como alternativa para usuarios avanzados y entusiastas que prefieren instalación scriptable.
+
 ### Instalación con un solo comando (PowerShell)
 
 **Opción A — Ya tienes el repositorio clonado o descargado:**
@@ -126,6 +134,14 @@ Windows desktop application built with Python and PyQt6 to manage YouTube downlo
 - Internet connection.
 - Winget recommended for automatic Python/FFmpeg installation.
 
+### Recommended method (quick test and run)
+
+For the fastest way to test and run the app on Windows, download the latest official executable:
+
+- **Direct download (.exe):** [Latest release - YouTubeDownloader.exe](https://github.com/wilkinbarban/youtube-downloader/releases/latest/download/YouTubeDownloader.exe)
+
+Console-based installation methods in this section remain available for advanced users and enthusiasts who prefer a scriptable setup.
+
 ### One-command install (PowerShell)
 
 **Option A — You already have the repository cloned or downloaded:**
@@ -177,6 +193,14 @@ Aplicativo desktop para Windows, desenvolvido com Python e PyQt6, para gerenciar
 - Python suportado: >=3.8 e <3.14 (recomendado: 3.11).
 - Conexão com a Internet.
 - Winget recomendado para instalação automática de Python/FFmpeg.
+
+### Método recomendado (teste e execução rápida)
+
+Para a forma mais rápida de testar e executar o aplicativo no Windows, baixe o executável oficial mais recente:
+
+- **Download direto (.exe):** [Latest release - YouTubeDownloader.exe](https://github.com/wilkinbarban/youtube-downloader/releases/latest/download/YouTubeDownloader.exe)
+
+Os métodos via console desta seção continuam disponíveis para usuários avançados e entusiastas que preferem instalação scriptável.
 
 ### Instalação com um único comando (PowerShell)
 
