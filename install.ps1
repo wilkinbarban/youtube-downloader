@@ -165,7 +165,7 @@ if (-not $PythonCmd) {
     try {
         $null = & python --version 2>&1
         if ($LASTEXITCODE -eq 0) {
-            $compatible = & python -c "import sys; raise SystemExit(0 if (3,8) <= sys.version_info < (3,14) else 1)" 2>&1
+            $null = & python -c "import sys; raise SystemExit(0 if (3,8) <= sys.version_info < (3,14) else 1)" 2>&1
             if ($LASTEXITCODE -eq 0) {
                 $PythonCmd = @('python')
                 Write-Ok "Compatible Python found in PATH."
@@ -216,9 +216,9 @@ $VenvDir    = Join-Path $ScriptRoot '.venv'
 $VenvPython = Join-Path $VenvDir 'Scripts\python.exe'
 $VenvPip    = Join-Path $VenvDir 'Scripts\pip.exe'
 
-# Recreate venv if it was built with an incompatible Python (e.g. 3.14)
+# Recreate venv if it was built with a Python outside the supported range.
 if (Test-Path $VenvPython) {
-    $incompatible = & $VenvPython -c "import sys; raise SystemExit(0 if sys.version_info < (3,14) else 1)" 2>&1
+    $null = & $VenvPython -c "import sys; raise SystemExit(0 if (3,8) <= sys.version_info < (3,14) else 1)" 2>&1
     if ($LASTEXITCODE -ne 0) {
         Write-Warn "Existing .venv uses an incompatible Python version. Recreating..."
         Remove-Item -Recurse -Force $VenvDir
