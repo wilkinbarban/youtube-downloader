@@ -64,7 +64,7 @@ Set-ExecutionPolicy -Scope Process Bypass; .\install.ps1
 ```powershell
 Set-ExecutionPolicy -Scope Process Bypass; irm https://raw.githubusercontent.com/wilkinbarban/youtube-downloader/main/install_secure.ps1 | iex
 ```
-> `install_secure.ps1` descarga el repositorio, verifica la integridad del archivo y delega en `install.ps1` localmente. Nunca ejecuta código remoto directamente.
+> `install_secure.ps1` descarga el repositorio al Escritorio por defecto (`%USERPROFILE%\Desktop\youtube-downloader`), verifica la integridad del archivo y delega en `install.ps1` localmente. Nunca ejecuta código remoto directamente.
 
 ### Instalación rápida (alternativa clásica)
 1. Clona o descarga el repositorio.
@@ -107,7 +107,7 @@ Set-ExecutionPolicy -Scope Process Bypass; .\install.ps1
 ```powershell
 Set-ExecutionPolicy -Scope Process Bypass; irm https://raw.githubusercontent.com/wilkinbarban/youtube-downloader/main/install_secure.ps1 | iex
 ```
-> `install_secure.ps1` downloads the repository over HTTPS, verifies the archive, and delegates to the local `install.ps1`. It never executes arbitrary remote code directly.
+> `install_secure.ps1` downloads the repository to Desktop by default (`%USERPROFILE%\Desktop\youtube-downloader`), verifies the archive, and delegates to the local `install.ps1`. It never executes arbitrary remote code directly.
 
 ### Quick start (classic alternative)
 1. Clone or download the repository.
@@ -150,7 +150,7 @@ Set-ExecutionPolicy -Scope Process Bypass; .\install.ps1
 ```powershell
 Set-ExecutionPolicy -Scope Process Bypass; irm https://raw.githubusercontent.com/wilkinbarban/youtube-downloader/main/install_secure.ps1 | iex
 ```
-> `install_secure.ps1` baixa o repositório via HTTPS, verifica a integridade do arquivo e delega para o `install.ps1` local. Nunca executa código remoto diretamente.
+> `install_secure.ps1` baixa o repositório para a Área de Trabalho por padrão (`%USERPROFILE%\Desktop\youtube-downloader`), verifica a integridade do arquivo e delega para o `install.ps1` local. Nunca executa código remoto diretamente.
 
 ### Início rápido (alternativa clássica)
 1. Clone ou baixe o repositório.

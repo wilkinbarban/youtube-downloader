@@ -25,7 +25,7 @@
 
 .PARAMETER InstallDir
     Target directory for the repository clone.
-    Defaults to: $HOME\youtube-downloader
+    Defaults to: $HOME\Desktop\youtube-downloader
 
 .EXAMPLE
     # One-liner from any PowerShell window (no Git required):
@@ -73,7 +73,11 @@ $RepoOwner   = 'wilkinbarban'
 $RepoName    = 'youtube-downloader'
 $Branch      = 'main'
 $ArchiveUrl  = "https://github.com/$RepoOwner/$RepoName/archive/refs/heads/$Branch.zip"
-$InstallDir  = if ($env:YTD_INSTALL_DIR) { $env:YTD_INSTALL_DIR } else { Join-Path $HOME $RepoName }
+$DesktopDir  = [Environment]::GetFolderPath('Desktop')
+if ([string]::IsNullOrWhiteSpace($DesktopDir)) {
+    $DesktopDir = Join-Path $HOME 'Desktop'
+}
+$InstallDir  = if ($env:YTD_INSTALL_DIR) { $env:YTD_INSTALL_DIR } else { Join-Path $DesktopDir $RepoName }
 $TempZip     = Join-Path $env:TEMP "$RepoName-$Branch.zip"
 $TempExtract = Join-Path $env:TEMP "$RepoName-extract-$(Get-Random)"
 

@@ -127,7 +127,11 @@ if (Test-Path $VenvPython) {
 
 if (-not (Test-Path $VenvPython)) {
     Write-Info "Creating isolated virtual environment..."
-    & @PythonCmd -m venv $VenvDir
+    if ($PythonCmd.Count -gt 1) {
+        & $PythonCmd[0] $PythonCmd[1] -m venv $VenvDir
+    } else {
+        & $PythonCmd[0] -m venv $VenvDir
+    }
     if ($LASTEXITCODE -ne 0) {
         Write-Fail "Failed to create virtual environment."
         exit 1
