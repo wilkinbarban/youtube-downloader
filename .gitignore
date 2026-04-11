@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+dist/
+
+# Virtual environments
+.env
+.venv/
+venv/
+ENV/
+env.bak/
+
+# Logs and local history
+*.log
+*.sqlite3
+
+# Windows and editor config
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.vscode/
+.idea/
+
+# Project-internal files (not needed by end users)
+memoria.mc
+readme.mc
+
+# Documentation screenshots (not bundled)
+docs/screenshots/*.png
+docs/screenshots/*.jpg
+docs/screenshots/*.jpeg
+docs/screenshots/*.webp

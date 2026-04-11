@@ -1,0 +1,25 @@
+﻿# ==========================================
+# YouTube Downloader Dependencies (Windows)
+# ==========================================
+# Project Python policy:
+#   - Supported: Python >=3.8 and <3.14
+#   - Recommended: Python 3.11
+# Note: PyQt6/Qt6 on Python 3.14 may trigger DLL loading errors on Windows.
+
+# Graphical interface and visual components
+PyQt6>=6.11.0,<6.12 ; python_version >= "3.8" and python_version < "3.14"
+
+# Main download and metadata extraction engine
+yt-dlp>=2024.0.0 ; python_version >= "3.8" and python_version < "3.14"
+
+# Clipboard handling (automatic monitor)
+pyperclip~=1.8.1 ; python_version >= "3.8" and python_version < "3.14"
+
+# Process and system resource management
+psutil~=5.9.0 ; python_version >= "3.8" and python_version < "3.14"
+
+# File and path helpers
+pathlib2~=2.3.7 ; python_version >= "3.8" and python_version < "3.14"
+
+# ==================================
+ffmpeg-python>=0.2.0 ; python_version >= "3.8" and python_version < "3.14"
