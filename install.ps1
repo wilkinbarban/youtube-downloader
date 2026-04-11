@@ -29,6 +29,13 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
+# When this script is executed via "irm ... | iex", $PSScriptRoot can be empty.
+# Use current location as a safe fallback so path operations never receive an empty string.
+$ScriptRoot = $PSScriptRoot
+if ([string]::IsNullOrWhiteSpace($ScriptRoot)) {
+    $ScriptRoot = (Get-Location).Path
+}
+
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -52,7 +59,7 @@ Write-Host ""
 $RequiredFiles = @('youtube_downloader.py', 'requirements.txt')
 $IsProjectRoot = $true
 foreach ($file in $RequiredFiles) {
-    if (-not (Test-Path (Join-Path $PSScriptRoot $file))) {
+    if (-not (Test-Path (Join-Path $ScriptRoot $file))) {
         $IsProjectRoot = $false
         break
     }
@@ -189,7 +196,7 @@ if (-not $PythonCmd) {
 Write-Host ""
 Write-Step "Setting up virtual environment (.venv)..."
 
-$VenvDir    = Join-Path $PSScriptRoot '.venv'
+$VenvDir    = Join-Path $ScriptRoot '.venv'
 $VenvPython = Join-Path $VenvDir 'Scripts\python.exe'
 $VenvPip    = Join-Path $VenvDir 'Scripts\pip.exe'
 
@@ -225,7 +232,7 @@ Write-Host ""
 Write-Step "Installing dependencies..."
 
 & $VenvPython -m pip install --upgrade pip --quiet
-& $VenvPip install -r (Join-Path $PSScriptRoot 'requirements.txt')
+& $VenvPip install -r (Join-Path $ScriptRoot 'requirements.txt')
 if ($LASTEXITCODE -ne 0) {
     Write-Fail "Dependency installation failed. Check the output above for details."
     exit 1
@@ -239,7 +246,7 @@ Write-Host ""
 Write-Ok "Launching YouTube Downloader..."
 Write-Host ""
 
-& $VenvPython (Join-Path $PSScriptRoot 'youtube_downloader.py')
+& $VenvPython (Join-Path $ScriptRoot 'youtube_downloader.py')
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host ""
