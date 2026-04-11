@@ -39,7 +39,7 @@ from app_core import (
     parse_youtube_url,
     quality_label,
 )
-from app_dialogs import ConfigDialog, DependenciesDialog, DonationDialog
+from app_dialogs import ConfigDialog, DependenciesDialog, DonationDialog, HelpDialog
 from app_dependencies import DependencyManager
 from app_i18n import LANGUAGES, normalize_language, translate
 from app_logging import logger
@@ -242,6 +242,9 @@ class MainWindow(QMainWindow):
         self.action_about = QAction(self)
         self.action_about.triggered.connect(self.show_about_dialog)
 
+        self.action_help_manual = QAction(self)
+        self.action_help_manual.triggered.connect(self.show_help_dialog)
+
         self.action_donate = QAction(self)
         self.action_donate.triggered.connect(self.show_donation_dialog)
         self.action_donate.setText(self.t("menu_donate"))
@@ -268,6 +271,8 @@ class MainWindow(QMainWindow):
         for code in LANGUAGES:
             self.menu_language.addAction(self.language_actions[code])
 
+        self.menu_help.addAction(self.action_help_manual)
+        self.menu_help.addSeparator()
         self.menu_help.addAction(self.action_donate)
         self.menu_help.addSeparator()
         self.menu_help.addAction(self.action_about)
@@ -788,6 +793,7 @@ class MainWindow(QMainWindow):
         self.action_clear_logs.setText(self.t("btn_clear_logs"))
         self.action_config.setText(self.t("btn_config"))
         self.action_dependencies.setText(self.t("btn_dependencies"))
+        self.action_help_manual.setText(self.t("menu_help_manual"))
         self.action_donate.setText(self.t("menu_donate"))
         self.action_about.setText(self.t("menu_about"))
         
@@ -1019,6 +1025,11 @@ class MainWindow(QMainWindow):
 
     def show_about_dialog(self):
         QMessageBox.information(self, self.t("about_title"), self.t("about_body"))
+
+    def show_help_dialog(self):
+        """Open user guide in selected language."""
+        dialog = HelpDialog(self.language, self)
+        dialog.exec()
 
     def show_donation_dialog(self):
         """Open donation dialog with PayPal QR code."""

@@ -108,6 +108,7 @@ class DownloadWorker(QThread):
         import yt_dlp
 
         self._ensure_not_cancelled()
+        ffmpeg_location = DependencyManager.get_ffmpeg_location()
 
         # Phase 1: fetch metadata only to obtain the video title.
         # noplaylist=True ensures a single-video result even when the URL
@@ -119,6 +120,8 @@ class DownloadWorker(QThread):
             "noplaylist": True,
             "js_runtimes": ytdlp_js_runtimes(),
         }
+        if ffmpeg_location:
+            ydl_extract_opts["ffmpeg_location"] = ffmpeg_location
 
         with yt_dlp.YoutubeDL(ydl_extract_opts) as ydl_extract:
             info_only = ydl_extract.extract_info(self.url, download=False)
@@ -139,6 +142,8 @@ class DownloadWorker(QThread):
             "restrictfilenames": True,
             "js_runtimes": ytdlp_js_runtimes(),
         }
+        if ffmpeg_location:
+            ydl_opts["ffmpeg_location"] = ffmpeg_location
         if self.quality != "audio":
             ydl_opts["merge_output_format"] = merge_fmt
 

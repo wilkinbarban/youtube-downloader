@@ -6,6 +6,7 @@ import shutil
 import subprocess
 import sys
 
+from app_paths import BUNDLED_FFMPEG_DIR, BUNDLED_FFMPEG_EXE, BUNDLED_FFPROBE_EXE
 from app_logging import logger
 
 
@@ -72,8 +73,19 @@ class DependencyManager:
 
     @staticmethod
     def has_ffmpeg_binary():
-        import shutil
-        return shutil.which("ffmpeg") is not None
+        return DependencyManager.get_ffmpeg_location() is not None
+
+    @staticmethod
+    def get_ffmpeg_location():
+        """Return a usable ffmpeg location for yt-dlp or None if unavailable."""
+        if os.path.exists(BUNDLED_FFMPEG_EXE) and os.path.exists(BUNDLED_FFPROBE_EXE):
+            return BUNDLED_FFMPEG_DIR
+
+        ffmpeg_path = shutil.which("ffmpeg")
+        if ffmpeg_path:
+            return os.path.dirname(ffmpeg_path)
+
+        return None
 
 
 def ensure_runtime_dependencies():

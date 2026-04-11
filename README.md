@@ -80,6 +80,8 @@ Para la forma más rápida de probar y ejecutar la aplicación en Windows, desca
 
 - **Descarga directa (.exe):** [Latest release - YouTubeDownloader.exe](https://github.com/wilkinbarban/youtube-downloader/releases/latest/download/YouTubeDownloader.exe)
 
+Este ejecutable ofrece la mejor experiencia para usuarios no técnicos: incluye el runtime necesario de la app y un FFmpeg portable empaquetado, evitando instalación manual en la mayoría de los casos.
+
 Los métodos por consola de esta sección se mantienen como alternativa para usuarios avanzados y entusiastas que prefieren instalación scriptable.
 
 ### Instalación con un solo comando (PowerShell)
@@ -107,7 +109,7 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force; irm https://r
 3. El script valida Python, crea `.venv`, instala dependencias y abre la app.
 
 ### Dependencia FFmpeg
-Si FFmpeg no está instalado, la aplicación puede ofrecer instalarlo automáticamente en Windows usando winget.
+Si utilizas el `.exe` oficial más reciente, FFmpeg ya va empaquetado con la aplicación. La instalación manual de FFmpeg pasa a ser más relevante solo para uso desde código fuente o métodos basados en scripts.
 
 ### Donaciones
 En la barra de menú, ve a **Ayuda > Donar** para abrir el QR de PayPal (`assets/QR_Paypal.png`).
@@ -140,6 +142,8 @@ For the fastest way to test and run the app on Windows, download the latest offi
 
 - **Direct download (.exe):** [Latest release - YouTubeDownloader.exe](https://github.com/wilkinbarban/youtube-downloader/releases/latest/download/YouTubeDownloader.exe)
 
+This executable provides the best experience for non-technical users: it includes the required app runtime and a bundled portable FFmpeg build, so manual setup is usually unnecessary.
+
 Console-based installation methods in this section remain available for advanced users and enthusiasts who prefer a scriptable setup.
 
 ### One-command install (PowerShell)
@@ -167,7 +171,7 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force; irm https://r
 3. The script validates Python, creates `.venv`, installs dependencies, and launches the app.
 
 ### FFmpeg dependency
-If FFmpeg is missing, the app can prompt an automatic installation on Windows through winget.
+If you use the latest official `.exe` release, FFmpeg is already bundled with the application. Manual FFmpeg installation becomes mainly relevant for source-based or script-based setups.
 
 ### Donations
 In the menu bar, go to **Help > Donate** to open the PayPal QR code (`assets/QR_Paypal.png`).
@@ -200,6 +204,8 @@ Para a forma mais rápida de testar e executar o aplicativo no Windows, baixe o 
 
 - **Download direto (.exe):** [Latest release - YouTubeDownloader.exe](https://github.com/wilkinbarban/youtube-downloader/releases/latest/download/YouTubeDownloader.exe)
 
+Este executável oferece a melhor experiência para usuários não técnicos: ele inclui o runtime necessário do aplicativo e um FFmpeg portátil empacotado, evitando instalação manual na maioria dos casos.
+
 Os métodos via console desta seção continuam disponíveis para usuários avançados e entusiastas que preferem instalação scriptável.
 
 ### Instalação com um único comando (PowerShell)
@@ -227,7 +233,7 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force; irm https://r
 3. O script valida o Python, cria o `.venv`, instala as dependências e inicia o aplicativo.
 
 ### Dependência FFmpeg
-Se o FFmpeg não estiver instalado, o aplicativo pode oferecer instalação automática no Windows via winget.
+Se você usar o `.exe` oficial mais recente, o FFmpeg já vai empacotado com a aplicação. A instalação manual do FFmpeg passa a ser mais relevante apenas para uso via código-fonte ou scripts.
 
 ### Doações
 Na barra de menu, acesse **Ajuda > Doar** para abrir o QR do PayPal (`assets/QR_Paypal.png`).

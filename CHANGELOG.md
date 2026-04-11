@@ -13,6 +13,7 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Restored GitHub Actions CI workflow in `.github/workflows/ci.yml` for dependency install and Python compile checks.
 - Added release build workflow in `.github/workflows/release-build.yml` to package a Windows `.exe` and attach it to GitHub Releases.
 - Added public roadmap file `ROADMAP.md` with milestones for versions `1.1.0`, `1.2.0`, and `2.0.0`.
+- Added bundled portable FFmpeg to the Windows release build so the official `.exe` works out-of-the-box for non-technical users.
 
 ### Planned
 - Screenshots and visual documentation.

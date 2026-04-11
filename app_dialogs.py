@@ -272,4 +272,29 @@ class DonationDialog(QDialog):
         self.setLayout(layout)
 
 
+class HelpDialog(QDialog):
+    """User-friendly help manual dialog shown from the Help menu."""
+
+    def __init__(self, language, parent=None):
+        super().__init__(parent)
+        self.language = language
+        self.setWindowTitle(translate(self.language, "help_manual_title"))
+        self.setGeometry(120, 80, 860, 680)
+        self.init_ui()
+
+    def init_ui(self):
+        layout = QVBoxLayout()
+
+        self.text_help = QTextEdit()
+        self.text_help.setReadOnly(True)
+        self.text_help.setPlainText(translate(self.language, "help_manual_body"))
+        layout.addWidget(self.text_help)
+
+        btn_close = QPushButton(translate(self.language, "btn_close"))
+        btn_close.clicked.connect(self.accept)
+        layout.addWidget(btn_close)
+
+        self.setLayout(layout)
+
+
 
