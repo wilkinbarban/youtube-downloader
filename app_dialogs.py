@@ -1,6 +1,9 @@
 """Settings and dependency-management dialogs."""
 
-from PyQt6.QtCore import pyqtSignal
+import os
+
+from PyQt6.QtCore import pyqtSignal, Qt
+from PyQt6.QtGui import QPixmap
 from PyQt6.QtWidgets import (
     QCheckBox,
     QComboBox,
@@ -203,3 +206,70 @@ class ConfigDialog(QDialog):
                 translate(self.language, "msg_error"),
                 translate(self.language, "config_save_failed"),
             )
+
+
+class DonationDialog(QDialog):
+    """Professional donation dialog with PayPal QR code."""
+
+    def __init__(self, language, parent=None):
+        super().__init__(parent)
+        self.language = language
+        self.setWindowTitle(translate(self.language, "donation_title"))
+        self.setMinimumSize(380, 420)
+        self.setStyleSheet("""
+            QDialog {
+                background-color: #ffffff;
+            }
+            QLabel {
+                color: #1f2937;
+            }
+            QPushButton#donationCloseButton {
+                background-color: #2563eb;
+                color: #ffffff;
+                border: none;
+                border-radius: 8px;
+                padding: 4px 10px;
+                font-weight: 600;
+            }
+            QPushButton#donationCloseButton:hover {
+                background-color: #1d4ed8;
+            }
+            QPushButton#donationCloseButton:pressed {
+                background-color: #1e40af;
+            }
+        """)
+        self.init_ui()
+
+    def init_ui(self):
+        layout = QVBoxLayout()
+        layout.setSpacing(12)
+        layout.setContentsMargins(24, 22, 24, 22)
+
+        qr_label = QLabel()
+        qr_label.setMinimumHeight(280)
+        qr_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        from app_paths import QR_PAYPAL
+        if QR_PAYPAL and os.path.exists(QR_PAYPAL):
+            pixmap = QPixmap(QR_PAYPAL)
+            if not pixmap.isNull():
+                scaled_pixmap = pixmap.scaled(
+                    260,
+                    260,
+                    Qt.AspectRatioMode.KeepAspectRatio,
+                    Qt.TransformationMode.SmoothTransformation,
+                )
+                qr_label.setPixmap(scaled_pixmap)
+
+        layout.addWidget(qr_label)
+
+        btn_close = QPushButton(translate(self.language, "btn_close"))
+        btn_close.setObjectName("donationCloseButton")
+        btn_close.setFixedSize(96, 30)
+        btn_close.clicked.connect(self.accept)
+        layout.addWidget(btn_close, alignment=Qt.AlignmentFlag.AlignCenter)
+
+        self.setLayout(layout)
+
+
+

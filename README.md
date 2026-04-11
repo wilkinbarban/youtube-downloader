@@ -33,6 +33,18 @@
 
 ---
 
+## Capturas de interfaz / Interface Screenshots / Capturas da interface
+
+Vista principal de la aplicación · Main application view · Tela principal do aplicativo
+
+![Captura 1](assets/Captura_1.png)
+
+Vista de descargas y estado · Downloads and status view · Tela de downloads e status
+
+![Captura 2](assets/Captura_2.png)
+
+---
+
 ## Español
 
 ### Descripción
@@ -78,6 +90,10 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force; irm https://r
 
 ### Dependencia FFmpeg
 Si FFmpeg no está instalado, la aplicación puede ofrecer instalarlo automáticamente en Windows usando winget.
+
+### Donaciones
+En la barra de menú, ve a **Ayuda > Donar** para abrir el QR de PayPal (`assets/QR_Paypal.png`).
+Si el proyecto te resulta útil, tu apoyo ayuda a mantener y mejorar la aplicación.
 
 ---
 
@@ -127,6 +143,10 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force; irm https://r
 ### FFmpeg dependency
 If FFmpeg is missing, the app can prompt an automatic installation on Windows through winget.
 
+### Donations
+In the menu bar, go to **Help > Donate** to open the PayPal QR code (`assets/QR_Paypal.png`).
+If you find the project useful, your support helps maintain and improve the app.
+
 ---
 
 ## Português (Brasil)
@@ -175,6 +195,10 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force; irm https://r
 ### Dependência FFmpeg
 Se o FFmpeg não estiver instalado, o aplicativo pode oferecer instalação automática no Windows via winget.
 
+### Doações
+Na barra de menu, acesse **Ajuda > Doar** para abrir o QR do PayPal (`assets/QR_Paypal.png`).
+Se o projeto for útil para você, seu apoio ajuda a manter e melhorar o aplicativo.
+
 ---
 
 ## Project structure
@@ -195,7 +219,6 @@ Se o FFmpeg não estiver instalado, o aplicativo pode oferecer instalação auto
 | `install_secure.ps1` | Secure remote installer: downloads repo from GitHub, verifies, then runs install.ps1 |
 | `requirements.txt` | Python dependencies with version policy |
 | `assets/` | Icons and visual resources |
-| `.github/workflows/ci.yml` | CI pipeline (syntax check, Python version guard) |
 
 ---
 

@@ -9,6 +9,8 @@ APP_ICON_ICO = os.path.join(ASSETS_DIR, "icon.ico")
 APP_ICON_PNG = os.path.join(ASSETS_DIR, "icon.png")
 APP_ICON = APP_ICON_ICO if os.path.exists(APP_ICON_ICO) else APP_ICON_PNG
 
+QR_PAYPAL = os.path.join(ASSETS_DIR, "QR_Paypal.png")
+
 # Standard Windows paths (Local AppData) for persistent config and logs
 LOCAL_APP_DATA = os.environ.get("LOCALAPPDATA", os.path.expanduser("~\\AppData\\Local"))
 APP_DATA_DIR = os.path.join(LOCAL_APP_DATA, "YouTube_Downloader")

@@ -39,7 +39,7 @@ from app_core import (
     parse_youtube_url,
     quality_label,
 )
-from app_dialogs import ConfigDialog, DependenciesDialog
+from app_dialogs import ConfigDialog, DependenciesDialog, DonationDialog
 from app_dependencies import DependencyManager
 from app_i18n import LANGUAGES, normalize_language, translate
 from app_logging import logger
@@ -242,6 +242,10 @@ class MainWindow(QMainWindow):
         self.action_about = QAction(self)
         self.action_about.triggered.connect(self.show_about_dialog)
 
+        self.action_donate = QAction(self)
+        self.action_donate.triggered.connect(self.show_donation_dialog)
+        self.action_donate.setText(self.t("menu_donate"))
+
         self.menu_file.addAction(self.action_add_url)
         self.menu_file.addSeparator()
         self.menu_file.addAction(self.action_quit)
@@ -264,6 +268,8 @@ class MainWindow(QMainWindow):
         for code in LANGUAGES:
             self.menu_language.addAction(self.language_actions[code])
 
+        self.menu_help.addAction(self.action_donate)
+        self.menu_help.addSeparator()
         self.menu_help.addAction(self.action_about)
 
     def _enqueue_playlist_tasks(self, videos, quality):
@@ -782,6 +788,7 @@ class MainWindow(QMainWindow):
         self.action_clear_logs.setText(self.t("btn_clear_logs"))
         self.action_config.setText(self.t("btn_config"))
         self.action_dependencies.setText(self.t("btn_dependencies"))
+        self.action_donate.setText(self.t("menu_donate"))
         self.action_about.setText(self.t("menu_about"))
         
         self.btn_add_url.setText(self.t("btn_add_url"))
@@ -1012,6 +1019,12 @@ class MainWindow(QMainWindow):
 
     def show_about_dialog(self):
         QMessageBox.information(self, self.t("about_title"), self.t("about_body"))
+
+    def show_donation_dialog(self):
+        """Open donation dialog with PayPal QR code."""
+        dialog = DonationDialog(self.language, self)
+        dialog.exec()
+
 
     def _apply_platform_runtime_checks(self):
         if not DependencyManager.has_ffmpeg_binary():
