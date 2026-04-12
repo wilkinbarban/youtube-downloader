@@ -31,7 +31,10 @@ jobs:
         shell: powershell
         run: |
           choco install ffmpeg -y
-          $ffmpegDir = Split-Path ((Get-Command ffmpeg).Source) -Parent
+          $ffmpegDir = "C:\\ProgramData\\chocolatey\\lib\\ffmpeg\\tools\\ffmpeg\\bin"
+          if (-not (Test-Path "$ffmpegDir\\ffmpeg.exe") -or -not (Test-Path "$ffmpegDir\\ffprobe.exe")) {
+            throw "Real FFmpeg binaries were not found at expected path: $ffmpegDir"
+          }
           New-Item -ItemType Directory -Force -Path build-resources\ffmpeg\bin | Out-Null
           Copy-Item "$ffmpegDir\*" build-resources\ffmpeg\bin -Recurse -Force
 
