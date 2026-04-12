@@ -31,6 +31,9 @@ Desktop.ini
 
 # Project-internal files (not needed by end users)
 memoria.mc
+agents.mc
+AGENTS.md
+AGENTS_1.MD
 readme.mc
 
 # Documentation screenshots (not bundled)
