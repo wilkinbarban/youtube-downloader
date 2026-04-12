@@ -47,6 +47,14 @@ Architecture modularization and release process consolidation.
 - Consolidated release build workflow and documentation updates for the new structure.
 - Fixed application icon resource resolution after the `src/` migration.
 
+### 1.2.1
+
+Root cleanup completion and src-only operational entrypoint.
+
+- Removed legacy root wrappers and consolidated imports to canonical `src.*` modules.
+- Standardized launch scripts to run `python -m src.main.youtube_downloader`.
+- Updated release packaging to build from `src/main/youtube_downloader.py` with stable import path settings.
+
 ## Next milestones
 
 ## Version 1.3.0

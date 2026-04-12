@@ -7,13 +7,15 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ## [Unreleased]
 
+### Planned
+- Screenshots and visual documentation.
+
+## [1.2.1] - 2026-04-12
+
 ### Changed
 - Removed legacy root-level compatibility wrappers (`app_*.py` and `youtube_downloader.py`) after migrating all internal imports and launch/build entrypoints to canonical `src.*` modules.
 - Updated launch scripts (`Iniciar.bat`, `install.ps1`) to start the app with `python -m src.main.youtube_downloader`.
 - Updated release build to package from `src/main/youtube_downloader.py` using `--paths "."` for stable import resolution.
-
-### Planned
-- Screenshots and visual documentation.
 
 ## [1.2.0] - 2026-04-12
 
