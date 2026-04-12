@@ -14,6 +14,9 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Added release build workflow in `.github/workflows/release-build.yml` to package a Windows `.exe` and attach it to GitHub Releases.
 - Added public roadmap file `ROADMAP.md` with milestones for versions `1.1.0`, `1.2.0`, and `2.0.0`.
 
+### Changed
+- Updated `ROADMAP.md` to explicitly separate released versions (`1.0.0`, `1.0.1`, `1.0.2`) from upcoming milestones (`1.1.0`, `1.2.0`, `2.0.0`).
+
 ### Planned
 - Screenshots and visual documentation.
 
