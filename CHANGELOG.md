@@ -16,6 +16,10 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Changed
 - Updated `ROADMAP.md` to explicitly separate released versions (`1.0.0`, `1.0.1`, `1.0.2`) from upcoming milestones (`1.1.0`, `1.2.0`, `2.0.0`).
+- Refactored project layout to a modular `src/` architecture with compatibility wrappers in root-level `app_*.py` files and `youtube_downloader.py`.
+- Updated CI compile checks to validate both transitional wrappers and canonical modules under `src/`.
+- Updated release build workflow to package the canonical entrypoint at `src/main/youtube_downloader.py`.
+- Updated README project structure table to document the new modular source tree.
 
 ### Planned
 - Screenshots and visual documentation.

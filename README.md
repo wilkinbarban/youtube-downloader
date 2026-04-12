@@ -248,6 +248,12 @@ Se o projeto for útil para você, seu apoio ajuda a manter e melhorar o aplicat
 
 | File / Folder | Description |
 |---|---|
+| `src/` | Canonical source tree for modular architecture |
+| `src/main/` | Main entrypoint and app bootstrap |
+| `src/modules/` | Domain and UI modules |
+| `src/services/` | Runtime services (workers, dependency orchestration) |
+| `src/config/` | Shared configuration modules (paths, i18n) |
+| `src/utils/` | Shared utility modules (logging, helpers) |
 | `youtube_downloader.py` | Application entry point |
 | `app_main_window.py` | Main UI orchestration and download queue |
 | `app_core.py` | Domain logic, config, URL utilities |
