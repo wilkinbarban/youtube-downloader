@@ -72,7 +72,7 @@ Write-Host ""
 # Bootstrap mode: if this script is executed outside the project root,
 # download/update the repository first and then delegate to local install.
 # ---------------------------------------------------------------------------
-$RequiredFiles = @('youtube_downloader.py', 'requirements.txt')
+$RequiredFiles = @('src\main\youtube_downloader.py', 'requirements.txt')
 $IsProjectRoot = $true
 foreach ($file in $RequiredFiles) {
     if (-not (Test-Path (Join-Path $ScriptRoot $file))) {
@@ -262,7 +262,7 @@ Write-Host ""
 Write-Ok "Launching YouTube Downloader..."
 Write-Host ""
 
-& $VenvPython (Join-Path $ScriptRoot 'youtube_downloader.py')
+& $VenvPython -m src.main.youtube_downloader
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host ""

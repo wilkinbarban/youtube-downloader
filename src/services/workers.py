@@ -5,7 +5,7 @@ import time
 
 from PyQt6.QtCore import QThread, pyqtSignal
 
-from app_core import (
+from src.modules.core import (
     PlaylistExtractor,
     YouTubeValidator,
     canonical_video_url,
