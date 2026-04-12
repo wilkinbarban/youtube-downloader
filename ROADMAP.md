@@ -30,17 +30,26 @@ Out-of-the-box executable experience.
 - Release pipeline updated to package FFmpeg binaries correctly.
 - Documentation updated to prioritize the latest executable.
 
+### 1.1.0
+
+Reliability and quality automation hardening.
+
+- Full support for YouTube mix/radio `RD...` URLs as proper playlists.
+- Configurable limit for mix/radio queues, improved pending queue visualization, and related i18n keys.
+- Runtime policy hardening for Python compatibility (`>=3.8,<3.14`) across launcher, requirements, and CI.
+
+### 1.2.0
+
+Architecture modularization and release process consolidation.
+
+- Migrated to a canonical modular `src/` source tree with compatibility wrappers at repository root.
+- Updated CI compile checks to validate wrappers and canonical modules.
+- Consolidated release build workflow and documentation updates for the new structure.
+- Fixed application icon resource resolution after the `src/` migration.
+
 ## Next milestones
 
-## Version 1.1.0
-
-Focus: reliability and quality automation hardening.
-
-- Improve error handling and logs consistency in critical download flows.
-- Expand URL parsing edge-case tests for playlist/mix/radio scenarios.
-- Improve UI consistency in dialogs and status messages.
-
-## Version 1.2.0
+## Version 1.3.0
 
 Focus: onboarding and support experience.
 

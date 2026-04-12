@@ -6,11 +6,12 @@ import sys
 
 def resource_path(*parts):
 	"""Resolve bundled or source-tree resource paths."""
-	runtime_base_dir = getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__)))
+	source_root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+	runtime_base_dir = getattr(sys, "_MEIPASS", source_root_dir)
 	return os.path.join(runtime_base_dir, *parts)
 
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 ASSETS_DIR = resource_path("assets")
 
 APP_ICON_ICO = os.path.join(ASSETS_DIR, "icon.ico")
