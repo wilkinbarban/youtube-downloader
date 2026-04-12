@@ -254,15 +254,15 @@ Se o projeto for útil para você, seu apoio ajuda a manter e melhorar o aplicat
 | `src/services/` | Runtime services (workers, dependency orchestration) |
 | `src/config/` | Shared configuration modules (paths, i18n) |
 | `src/utils/` | Shared utility modules (logging, helpers) |
-| `youtube_downloader.py` | Application entry point |
-| `app_main_window.py` | Main UI orchestration and download queue |
-| `app_core.py` | Domain logic, config, URL utilities |
-| `app_workers.py` | Background workers (downloads, playlist extraction, clipboard monitor) |
-| `app_dependencies.py` | Dependency checks and auto-installers |
-| `app_dialogs.py` | Settings and dependency dialogs |
-| `app_i18n.py` | Multilingual string translations (ES / EN / PT-BR) |
-| `app_logging.py` | Logging utilities |
-| `app_paths.py` | Shared path helpers |
+| `src/main/youtube_downloader.py` | Canonical application entry point |
+| `src/modules/ui/main_window.py` | Main UI orchestration and download queue |
+| `src/modules/core.py` | Domain logic, config, URL utilities |
+| `src/services/workers.py` | Background workers (downloads, playlist extraction, clipboard monitor) |
+| `src/services/dependencies.py` | Dependency checks and auto-installers |
+| `src/modules/ui/dialogs.py` | Settings and dependency dialogs |
+| `src/config/i18n.py` | Multilingual string translations (ES / EN / PT-BR) |
+| `src/utils/logging.py` | Logging utilities |
+| `src/config/paths.py` | Shared path helpers |
 | `Iniciar.bat` | Windows bootstrap: validates Python, creates venv, installs deps, launches app |
 | `install.ps1` | PowerShell installer: same flow as Iniciar.bat, scriptable and pipeable |
 | `install_secure.ps1` | Secure remote installer: downloads repo from GitHub, verifies, then runs install.ps1 |

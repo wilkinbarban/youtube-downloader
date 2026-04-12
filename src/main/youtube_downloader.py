@@ -2,8 +2,8 @@
 
 import sys
 
-from app_dependencies import ensure_runtime_dependencies
-from app_paths import APP_ICON
+from src.services.dependencies import ensure_runtime_dependencies
+from src.config.paths import APP_ICON
 
 
 def main():
@@ -17,7 +17,7 @@ def main():
     from PyQt6.QtGui import QIcon
     from PyQt6.QtWidgets import QApplication
 
-    from app_main_window import MainWindow
+    from src.modules.ui.main_window import MainWindow
 
     app = QApplication(sys.argv)
     app.setWindowIcon(QIcon(APP_ICON))

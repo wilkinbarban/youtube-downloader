@@ -30,13 +30,13 @@ Alternatively, set up manually:
 python -m venv .venv
 .venv\Scripts\activate
 python -m pip install -r requirements.txt
-python youtube_downloader.py
+python -m src.main.youtube_downloader
 ```
 
 Run a syntax check before submitting:
 
 ```cmd
-python -m py_compile youtube_downloader.py app_paths.py app_logging.py app_dependencies.py app_core.py app_workers.py app_dialogs.py app_main_window.py
+python -m py_compile src\__init__.py src\main\__init__.py src\main\youtube_downloader.py src\config\__init__.py src\config\paths.py src\config\i18n.py src\utils\__init__.py src\utils\logging.py src\services\__init__.py src\services\dependencies.py src\services\workers.py src\modules\__init__.py src\modules\core.py src\modules\ui\__init__.py src\modules\ui\dialogs.py src\modules\ui\main_window.py
 ```
 
 ## Coding guidelines

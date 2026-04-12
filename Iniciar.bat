@@ -101,7 +101,7 @@ echo.
 
 :: 4. Application startup
 echo [INFO] Iniciando YouTube Downloader...
-"%VENV_PYTHON%" youtube_downloader.py
+"%VENV_PYTHON%" -m src.main.youtube_downloader
 
 if !errorlevel! neq 0 (
     echo.
