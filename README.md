@@ -35,10 +35,13 @@
 
 ## Public roadmap
 
-Project roadmap is available in [ROADMAP.md](ROADMAP.md) with planned milestones for:
+Project roadmap is available in [ROADMAP.md](ROADMAP.md) and now distinguishes:
+
+- Released versions (completed): `1.0.0`, `1.0.1`, `1.0.2`
+- Upcoming milestones:
 
 - `1.1.0` Reliability and quality automation
-- `1.2.0` Distribution and onboarding
+- `1.2.0` Onboarding and support experience
 - `2.0.0` Product maturity and extensibility
 
 ---
@@ -261,7 +264,7 @@ Se o projeto for útil para você, seu apoio ajuda a manter e melhorar o aplicat
 | `assets/` | Icons and visual resources |
 | `.github/workflows/ci.yml` | CI pipeline for dependency install and Python compile checks |
 | `.github/workflows/release-build.yml` | Windows `.exe` build and auto-attach to GitHub Releases |
-| `ROADMAP.md` | Public roadmap for versions 1.1.0, 1.2.0 and 2.0.0 |
+| `ROADMAP.md` | Public roadmap with completed releases (1.0.0-1.0.2) and upcoming milestones (1.1.0, 1.2.0, 2.0.0) |
 
 ---
 
