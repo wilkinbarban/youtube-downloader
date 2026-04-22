@@ -3,6 +3,7 @@
 from datetime import datetime
 import os
 import time
+import webbrowser
 from queue import Empty, Queue
 
 from PyQt6.QtCore import QTimer, Qt
@@ -20,6 +21,7 @@ from PyQt6.QtWidgets import (
     QMessageBox,
     QProgressDialog,
     QPushButton,
+    QStyle,
     QTabWidget,
     QTableWidget,
     QTableWidgetItem,
@@ -39,11 +41,13 @@ from src.modules.core import (
     parse_youtube_url,
     quality_label,
 )
-from src.modules.ui.dialogs import ConfigDialog, DependenciesDialog, DonationDialog, HelpDialog
+from src.modules.ui.dialogs import ConfigDialog, DependenciesDialog, HelpDialog, SupportDialog
 from src.services.dependencies import DependencyManager
+from src.services.update_service import UpdateService
 from src.config.i18n import LANGUAGES, normalize_language, translate
 from src.utils.logging import logger
 from src.config.paths import APP_ICON
+from src.constants import VERSION
 from src.services.workers import ClipboardMonitor, DownloadWorker, PlaylistExtractWorker
 
 
@@ -185,6 +189,8 @@ class MainWindow(QMainWindow):
         self.refresh_logs()
 
     def init_menu_bar(self):
+        style = self.style()
+
         self.menu_file = self.menuBar().addMenu("")
         self.menu_downloads = self.menuBar().addMenu("")
         self.menu_view = self.menuBar().addMenu("")
@@ -195,59 +201,79 @@ class MainWindow(QMainWindow):
         self.action_add_url = QAction(self)
         self.action_add_url.triggered.connect(self.add_url_manual)
         self.action_add_url.setShortcut(QKeySequence("Ctrl+N"))
+        self.action_add_url.setIcon(style.standardIcon(QStyle.StandardPixmap.SP_FileDialogNewFolder))
 
         self.action_quit = QAction(self)
         self.action_quit.triggered.connect(self.close)
         self.action_quit.setShortcut(QKeySequence.StandardKey.Quit)
+        self.action_quit.setIcon(style.standardIcon(QStyle.StandardPixmap.SP_DialogCloseButton))
 
         self.action_pause = QAction(self)
         self.action_pause.triggered.connect(self.toggle_pause)
         self.action_pause.setShortcut(QKeySequence("Ctrl+P"))
+        self.action_pause.setIcon(style.standardIcon(QStyle.StandardPixmap.SP_MediaPause))
 
         self.action_cancel_active = QAction(self)
         self.action_cancel_active.triggered.connect(self.cancel_active_downloads)
+        self.action_cancel_active.setIcon(style.standardIcon(QStyle.StandardPixmap.SP_DialogCancelButton))
 
         self.action_show_downloads = QAction(self)
         self.action_show_downloads.triggered.connect(lambda: self.tabs.setCurrentWidget(self.tab_downloads))
+        self.action_show_downloads.setIcon(style.standardIcon(QStyle.StandardPixmap.SP_ArrowDown))
 
         self.action_show_history = QAction(self)
         self.action_show_history.triggered.connect(lambda: self.tabs.setCurrentWidget(self.tab_history))
+        self.action_show_history.setIcon(style.standardIcon(QStyle.StandardPixmap.SP_FileDialogListView))
 
         self.action_show_logs = QAction(self)
         self.action_show_logs.triggered.connect(lambda: self.tabs.setCurrentWidget(self.tab_logs))
+        self.action_show_logs.setIcon(style.standardIcon(QStyle.StandardPixmap.SP_FileDialogInfoView))
 
         self.action_clear_history = QAction(self)
         self.action_clear_history.triggered.connect(self.clear_history)
+        self.action_clear_history.setIcon(style.standardIcon(QStyle.StandardPixmap.SP_TrashIcon))
 
         self.action_refresh_logs = QAction(self)
         self.action_refresh_logs.triggered.connect(self.refresh_logs)
         self.action_refresh_logs.setShortcut(QKeySequence.StandardKey.Refresh)
+        self.action_refresh_logs.setIcon(style.standardIcon(QStyle.StandardPixmap.SP_BrowserReload))
 
         self.action_clear_logs = QAction(self)
         self.action_clear_logs.triggered.connect(self.clear_logs_dialog)
+        self.action_clear_logs.setIcon(style.standardIcon(QStyle.StandardPixmap.SP_TrashIcon))
 
         self.language_actions = {}
         for code in LANGUAGES:
             action = QAction(self)
             action.setCheckable(True)
             action.triggered.connect(lambda checked, lang_code=code: self.apply_language(lang_code))
+            action.setIcon(style.standardIcon(QStyle.StandardPixmap.SP_FileDialogContentsView))
             self.language_actions[code] = action
 
         self.action_config = QAction(self)
         self.action_config.triggered.connect(self.open_config)
+        self.action_config.setIcon(style.standardIcon(QStyle.StandardPixmap.SP_FileDialogDetailedView))
 
         self.action_dependencies = QAction(self)
         self.action_dependencies.triggered.connect(self.open_dependencies)
+        self.action_dependencies.setIcon(style.standardIcon(QStyle.StandardPixmap.SP_ComputerIcon))
 
         self.action_about = QAction(self)
         self.action_about.triggered.connect(self.show_about_dialog)
+        self.action_about.setIcon(style.standardIcon(QStyle.StandardPixmap.SP_MessageBoxInformation))
 
         self.action_help_manual = QAction(self)
         self.action_help_manual.triggered.connect(self.show_help_dialog)
+        self.action_help_manual.setIcon(style.standardIcon(QStyle.StandardPixmap.SP_DialogHelpButton))
+
+        self.action_check_updates = QAction(self)
+        self.action_check_updates.triggered.connect(self._action_check_updates)
+        self.action_check_updates.setIcon(style.standardIcon(QStyle.StandardPixmap.SP_BrowserReload))
 
         self.action_donate = QAction(self)
-        self.action_donate.triggered.connect(self.show_donation_dialog)
-        self.action_donate.setText(self.t("menu_donate"))
+        self.action_donate.triggered.connect(self.show_support_dialog)
+        self.action_donate.setText(self.t("action_support_project"))
+        self.action_donate.setIcon(style.standardIcon(QStyle.StandardPixmap.SP_DialogYesButton))
 
         self.menu_file.addAction(self.action_add_url)
         self.menu_file.addSeparator()
@@ -272,6 +298,7 @@ class MainWindow(QMainWindow):
             self.menu_language.addAction(self.language_actions[code])
 
         self.menu_help.addAction(self.action_help_manual)
+        self.menu_help.addAction(self.action_check_updates)
         self.menu_help.addSeparator()
         self.menu_help.addAction(self.action_donate)
         self.menu_help.addSeparator()
@@ -771,6 +798,41 @@ class MainWindow(QMainWindow):
     def t(self, key, **kwargs):
         return translate(self.language, key, **kwargs)
 
+    def _action_check_updates(self):
+        """Manually check latest GitHub release and compare with local version."""
+        result = UpdateService.check_for_updates(current_version=VERSION)
+        status = result.get("status")
+
+        if status == "error":
+            QMessageBox.warning(
+                self,
+                self.t("version_title"),
+                self.t("update_check_error"),
+            )
+            return
+
+        if status == "available":
+            reply = QMessageBox.information(
+                self,
+                self.t("update_available_title"),
+                self.t(
+                    "update_available_message",
+                    latest=result.get("latest", "-"),
+                    current=result.get("current", "-"),
+                ),
+                QMessageBox.StandardButton.Ok | QMessageBox.StandardButton.Cancel,
+                QMessageBox.StandardButton.Ok,
+            )
+            if reply == QMessageBox.StandardButton.Ok:
+                webbrowser.open(result.get("url", "https://github.com/wilkinbarban/youtube-downloader/releases/latest"))
+            return
+
+        QMessageBox.information(
+            self,
+            self.t("version_title"),
+            self.t("update_up_to_date"),
+        )
+
     def update_ui_texts(self):
         self.setWindowTitle(self.t("app_title"))
         self.monitor_status_title.setText(self.t("monitor_status_label"))
@@ -794,7 +856,8 @@ class MainWindow(QMainWindow):
         self.action_config.setText(self.t("btn_config"))
         self.action_dependencies.setText(self.t("btn_dependencies"))
         self.action_help_manual.setText(self.t("menu_help_manual"))
-        self.action_donate.setText(self.t("menu_donate"))
+        self.action_check_updates.setText(self.t("action_updates"))
+        self.action_donate.setText(self.t("action_support_project"))
         self.action_about.setText(self.t("menu_about"))
         
         self.btn_add_url.setText(self.t("btn_add_url"))
@@ -1031,9 +1094,9 @@ class MainWindow(QMainWindow):
         dialog = HelpDialog(self.language, self)
         dialog.exec()
 
-    def show_donation_dialog(self):
-        """Open donation dialog with PayPal QR code."""
-        dialog = DonationDialog(self.language, self)
+    def show_support_dialog(self):
+        """Open support dialog with QR code for Wise (ES/EN) or PIX (PT)."""
+        dialog = SupportDialog(self.language, self)
         dialog.exec()
 
 

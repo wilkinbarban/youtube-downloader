@@ -55,6 +55,16 @@ Root cleanup completion and src-only operational entrypoint.
 - Standardized launch scripts to run `python -m src.main.youtube_downloader`.
 - Updated release packaging to build from `src/main/youtube_downloader.py` with stable import path settings.
 
+### 1.2.2
+
+Support UX modernization and manual update-check release.
+
+- Added manual update check from Help menu against latest GitHub Release.
+- Added semantic version comparison service (`src/services/update_service.py`) and single version source (`src/constants.py`).
+- Introduced modern support dialog with Wise (ES/EN) and PIX (PT) flows, inline animated feedback, and adaptive geometry hardening for Windows.
+- Added coherent iconography across all menu actions.
+- Updated i18n and docs to reflect support/update workflow changes.
+
 ## Next milestones
 
 ## Version 1.3.0

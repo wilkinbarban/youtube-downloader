@@ -18,8 +18,18 @@ pyperclip~=1.8.1 ; python_version >= "3.8" and python_version < "3.14"
 # Process and system resource management
 psutil~=5.9.0 ; python_version >= "3.8" and python_version < "3.14"
 
+# HTTP client for update checks
+requests>=2.28.0 ; python_version >= "3.8" and python_version < "3.14"
+
+# Semantic version parsing and comparison
+packaging>=23.0 ; python_version >= "3.8" and python_version < "3.14"
+
 # File and path helpers
 pathlib2~=2.3.7 ; python_version >= "3.8" and python_version < "3.14"
+
+# QR code generation (support dialog)
+qrcode[pil]>=7.4 ; python_version >= "3.8" and python_version < "3.14"
+Pillow>=9.0.0 ; python_version >= "3.8" and python_version < "3.14"
 
 # ==================================
 ffmpeg-python>=0.2.0 ; python_version >= "3.8" and python_version < "3.14"

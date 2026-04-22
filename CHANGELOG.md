@@ -10,6 +10,33 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 ### Planned
 - Screenshots and visual documentation.
 
+## [1.2.2] - 2026-04-22
+
+### Added
+- Manual update-check system from **Help** menu with semantic version comparison against latest GitHub Release.
+- New service module `src/services/update_service.py` to isolate network/update business logic from UI.
+- Version constant module `src/constants.py` as single source of truth (`VERSION = "1.2.2"`).
+- New multilingual i18n keys (ES/EN/PT) for update-check action and dialogs.
+- Consistent menu iconography across all top menu actions using standard Qt icons.
+- New support icon asset: `assets/support.svg`.
+
+### Changed
+- Replaced legacy donation popup flow with a modern support dialog (`SupportDialog`) integrated into app styling.
+- Updated support behavior by locale:
+	- ES/EN: Wise payment link (`https://wise.com/pay/me/wilkinb3`) with open/copy actions.
+	- PT: PIX key flow (`wilkin.barban@yahoo.com`) with copy action.
+- Reworked support dialog UX: hero card + QR card layout, larger QR preview, compact action buttons, and inline animated feedback for copy actions.
+- Hardened support dialog geometry handling on Windows to avoid `QWindowsWindow::setGeometry` warnings on constrained displays.
+- Added dependencies for new features:
+	- `requests>=2.28.0`
+	- `packaging>=23.0`
+	- `qrcode[pil]>=7.4`
+	- `Pillow>=9.0.0`
+
+### Fixed
+- Removed author email from About text in ES/EN/PT.
+- Unified copy-feedback behavior across languages in support dialog (consistent inline banner behavior for ES/EN/PT).
+
 ## [1.2.1] - 2026-04-12
 
 ### Changed

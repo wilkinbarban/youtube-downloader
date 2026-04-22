@@ -37,11 +37,10 @@
 
 Project roadmap is available in [ROADMAP.md](ROADMAP.md) and now distinguishes:
 
-- Released versions (completed): `1.0.0`, `1.0.1`, `1.0.2`
+- Released versions (completed): `1.0.0`, `1.0.1`, `1.0.2`, `1.1.0`, `1.2.0`, `1.2.1`, `1.2.2`
 - Upcoming milestones:
 
-- `1.1.0` Reliability and quality automation
-- `1.2.0` Onboarding and support experience
+- `1.3.0` Onboarding and support experience
 - `2.0.0` Product maturity and extensibility
 
 ---
@@ -115,8 +114,12 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force; irm https://r
 Si utilizas el `.exe` oficial más reciente, FFmpeg ya va empaquetado con la aplicación. La instalación manual de FFmpeg pasa a ser más relevante solo para uso desde código fuente o métodos basados en scripts.
 
 ### Donaciones
-En la barra de menú, ve a **Ayuda > Donar** para abrir el QR de PayPal (`assets/QR_Paypal.png`).
-Si el proyecto te resulta útil, tu apoyo ayuda a mantener y mejorar la aplicación.
+En la barra de menú, ve a **Ayuda > Ayuda al proyecto**.
+
+- **Español / English:** soporte por enlace Wise con QR y acciones de abrir/copiar.
+- **Português (Brasil):** suporte via chave PIX com QR e ação de copiar.
+
+Tu apoyo ayuda a mantener mejoras, correcciones y nuevas funciones.
 
 ---
 
@@ -177,8 +180,12 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force; irm https://r
 If you use the latest official `.exe` release, FFmpeg is already bundled with the application. Manual FFmpeg installation becomes mainly relevant for source-based or script-based setups.
 
 ### Donations
-In the menu bar, go to **Help > Donate** to open the PayPal QR code (`assets/QR_Paypal.png`).
-If you find the project useful, your support helps maintain and improve the app.
+In the menu bar, go to **Help > Support the project**.
+
+- **Spanish / English:** support via Wise payment link with QR and open/copy actions.
+- **Português (Brasil):** support via PIX key with QR and copy action.
+
+Your support helps maintain improvements, fixes, and new features.
 
 ---
 
@@ -239,8 +246,12 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force; irm https://r
 Se você usar o `.exe` oficial mais recente, o FFmpeg já vai empacotado com a aplicação. A instalação manual do FFmpeg passa a ser mais relevante apenas para uso via código-fonte ou scripts.
 
 ### Doações
-Na barra de menu, acesse **Ajuda > Doar** para abrir o QR do PayPal (`assets/QR_Paypal.png`).
-Se o projeto for útil para você, seu apoio ajuda a manter e melhorar o aplicativo.
+Na barra de menu, acesse **Ajuda > Apoiar o projeto**.
+
+- **Español / English:** suporte por link Wise com QR e ações de abrir/copiar.
+- **Português (Brasil):** suporte por chave PIX com QR e ação de copiar.
+
+Seu apoio ajuda a manter melhorias, correções e novos recursos.
 
 ---
 
@@ -252,6 +263,8 @@ Se o projeto for útil para você, seu apoio ajuda a manter e melhorar o aplicat
 | `src/main/` | Main entrypoint and app bootstrap |
 | `src/modules/` | Domain and UI modules |
 | `src/services/` | Runtime services (workers, dependency orchestration) |
+| `src/constants.py` | Single source of truth for application version |
+| `src/services/update_service.py` | Manual update-check service (GitHub Releases + semantic version comparison) |
 | `src/config/` | Shared configuration modules (paths, i18n) |
 | `src/utils/` | Shared utility modules (logging, helpers) |
 | `src/main/youtube_downloader.py` | Canonical application entry point |
@@ -259,7 +272,7 @@ Se o projeto for útil para você, seu apoio ajuda a manter e melhorar o aplicat
 | `src/modules/core.py` | Domain logic, config, URL utilities |
 | `src/services/workers.py` | Background workers (downloads, playlist extraction, clipboard monitor) |
 | `src/services/dependencies.py` | Dependency checks and auto-installers |
-| `src/modules/ui/dialogs.py` | Settings and dependency dialogs |
+| `src/modules/ui/dialogs.py` | Settings, dependencies, support and help dialogs |
 | `src/config/i18n.py` | Multilingual string translations (ES / EN / PT-BR) |
 | `src/utils/logging.py` | Logging utilities |
 | `src/config/paths.py` | Shared path helpers |
@@ -270,7 +283,7 @@ Se o projeto for útil para você, seu apoio ajuda a manter e melhorar o aplicat
 | `assets/` | Icons and visual resources |
 | `.github/workflows/ci.yml` | CI pipeline for dependency install and Python compile checks |
 | `.github/workflows/release-build.yml` | Windows `.exe` build and auto-attach to GitHub Releases |
-| `ROADMAP.md` | Public roadmap with completed releases (1.0.0-1.0.2) and upcoming milestones (1.1.0, 1.2.0, 2.0.0) |
+| `ROADMAP.md` | Public roadmap with completed releases and upcoming milestones |
 
 ---
 
