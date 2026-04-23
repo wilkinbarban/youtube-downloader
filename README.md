@@ -1,5 +1,5 @@
 ﻿<div align="center">
-  <img src="assets/icon.png" alt="YouTube Downloader Logo" width="128" height="128">
+  <img src="assets/icon.png" alt="YouTube Downloader Logo" width="228" height="228">
   <h1>YouTube Downloader</h1>
 
   [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
