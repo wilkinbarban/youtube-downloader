@@ -326,8 +326,9 @@ class FastApiServerWorker(QThread):
 
     def run(self):
         logger.log(f"Iniciando API Web en http://{self.host}:{self.port}", "INFO")
+        from src.web.app import app
         config = uvicorn.Config(
-            app="src.web.app:app",
+            app=app,
             host=self.host,
             port=self.port,
             loop="asyncio",

@@ -1,6 +1,25 @@
-"""Desktop application entry point."""
-
+import multiprocessing
 import sys
+
+# Windows multiprocessing freeze support
+multiprocessing.freeze_support()
+
+# Prevent crashes in windowed mode where sys.stdout and sys.stderr are None
+if sys.stdout is None:
+    class DummyStream:
+        def __init__(self):
+            self.encoding = 'utf-8'
+            self.errors = 'strict'
+        def write(self, *args, **kwargs):
+            pass
+        def flush(self, *args, **kwargs):
+            pass
+        def isatty(self):
+            return False
+    sys.stdout = DummyStream()
+
+if sys.stderr is None:
+    sys.stderr = sys.stdout
 
 from src.services.dependencies import ensure_runtime_dependencies
 from src.config.paths import APP_ICON

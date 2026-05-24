@@ -25,6 +25,7 @@ from PyQt6.QtWidgets import (
     QProgressDialog,
     QPushButton,
     QStyle,
+    QSystemTrayIcon,
     QTabWidget,
     QTableWidget,
     QTableWidgetItem,
@@ -90,6 +91,13 @@ class MainWindow(QMainWindow):
         self.manager.add_state_changed_callback(self.dispatcher.state_changed.emit)
         self.manager.add_summary_callback(self.dispatcher.summary_ready.emit)
         self.manager.add_progress_callback(lambda w_id, data: self.dispatcher.progress.emit(w_id, data))
+
+        # Initialize system tray
+        self.tray_icon = QSystemTrayIcon(QIcon(APP_ICON), self)
+        self.tray_menu = QMenu(self)
+        self.tray_icon.setContextMenu(self.tray_menu)
+        self.tray_icon.activated.connect(self.on_tray_icon_activated)
+        self.tray_icon.show()
 
         logger.log("Aplicacion iniciada", "INFO")
 
@@ -313,9 +321,11 @@ class MainWindow(QMainWindow):
         self.btn_clear_queue.setObjectName("btn_clear_queue")
         self.btn_clear_queue.clicked.connect(self.clear_queue_dialog)
         self.btn_clear_queue.setMinimumHeight(28)
-        self.btn_clear_queue.setStyleSheet(
-            "background-color: #78350f; color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.2);"
-        )
+
+        self.btn_minimize_tray = QPushButton()
+        self.btn_minimize_tray.setObjectName("btn_minimize_tray")
+        self.btn_minimize_tray.clicked.connect(self.minimize_to_tray)
+        self.btn_minimize_tray.setMinimumHeight(28)
 
         controls_layout.addWidget(self.lbl_global_controls)
         controls_layout.addSpacing(10)
@@ -325,6 +335,7 @@ class MainWindow(QMainWindow):
         controls_layout.addWidget(self.btn_clear_queue)
         controls_layout.addWidget(self.btn_settings)
         controls_layout.addWidget(self.btn_web_manager)
+        controls_layout.addWidget(self.btn_minimize_tray)
         controls_layout.addStretch()
         self.controls_card.setLayout(controls_layout)
         main_layout.addWidget(self.controls_card)
@@ -750,6 +761,41 @@ class MainWindow(QMainWindow):
                 width: 0px;
                 background: none;
             }
+
+            /* Clear queue button (Limpiar lista) with neon hover effects */
+            QPushButton#btn_clear_queue {
+                background-color: #78350f;
+                color: #fbbf24;
+                border: 1px solid rgba(251, 191, 36, 0.2);
+                border-radius: 10px;
+                padding: 7px 16px;
+                font-weight: 600;
+                font-size: 11px;
+            }
+            QPushButton#btn_clear_queue:hover {
+                background-color: #92400e;
+                color: #ffffff;
+                border-color: #fbbf24;
+            }
+            QPushButton#btn_clear_queue:pressed {
+                background-color: #b45309;
+                border-color: #fbbf24;
+            }
+
+            /* Minimize to tray button (same hover glow as standard QPushButtons) */
+            QPushButton#btn_minimize_tray {
+                background-color: #1e1b4b;
+                color: #fb7185;
+                border: 1px solid rgba(244, 63, 94, 0.2);
+                border-radius: 10px;
+                padding: 7px 16px;
+                font-weight: 600;
+                font-size: 11px;
+            }
+            QPushButton#btn_minimize_tray:hover {
+                background-color: #311c47;
+                border-color: #f43f5e;
+            }
         """)
 
     def init_downloads_tab(self):
@@ -1098,6 +1144,8 @@ class MainWindow(QMainWindow):
         self.line_url.clear()
 
     def start_clipboard_monitor(self):
+        if self.is_clipboard_monitor_active():
+            return
         self.clipboard_monitor = ClipboardMonitor(self.config["clipboard_interval"])
         self.clipboard_monitor.url_detected.connect(self.on_clipboard_url_detected)
         self.clipboard_monitor.start()
@@ -1162,6 +1210,7 @@ class MainWindow(QMainWindow):
             logger.log(self.t("resume_log"), "INFO")
         self.action_pause.setText(self.t("btn_resume_all") if paused else self.t("btn_pause_all"))
         self.btn_pause.setText(self.t("btn_resume_all") if paused else self.t("btn_pause_all"))
+        self.setup_tray_menu()
 
     def cancel_active_downloads(self):
         state = self.manager.get_state()
@@ -1375,7 +1424,9 @@ class MainWindow(QMainWindow):
         self.btn_clear_queue.setText(self.t("btn_clear_queue"))
         self.btn_settings.setText(self.t("btn_config"))
         self.btn_web_manager.setText(self.t("btn_web_manager"))
+        self.btn_minimize_tray.setText(self.t("btn_minimize_tray"))
         self.header_subtitle.setText(self.t("desktop_manager"))
+        self.setup_tray_menu()
         
         state = self.manager.get_state()
         active_count = len(state.get('active_downloads', {}))
@@ -1738,3 +1789,64 @@ class MainWindow(QMainWindow):
         elif error is not None:
             return str(error)
         return self.t("error_unknown")
+
+    def minimize_to_tray(self):
+        self.hide()
+        self.tray_icon.show()
+        if self.is_clipboard_monitor_active():
+            self.stop_clipboard_monitor()
+        # Show tray notification
+        self.tray_icon.showMessage(
+            self.t("tray_minimized_title"),
+            self.t("tray_minimized_message"),
+            QSystemTrayIcon.MessageIcon.Information,
+            3000
+        )
+
+    def restore_from_tray(self):
+        self.showNormal()
+        self.activateWindow()
+        self.raise_()
+        # Resume clipboard monitor if it is enabled in config
+        if self.config.get("clipboard_enabled") and not self.is_clipboard_monitor_active():
+            self.start_clipboard_monitor()
+
+    def on_tray_icon_activated(self, reason):
+        if reason in (QSystemTrayIcon.ActivationReason.Trigger, QSystemTrayIcon.ActivationReason.DoubleClick):
+            if self.isVisible() and not self.isMinimized():
+                self.minimize_to_tray()
+            else:
+                self.restore_from_tray()
+
+    def setup_tray_menu(self):
+        self.tray_menu.clear()
+        
+        restore_action = QAction(self.t("tray_action_restore"), self)
+        restore_action.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_TitleBarNormalButton))
+        restore_action.triggered.connect(self.restore_from_tray)
+        
+        web_action = QAction(self.t("tray_action_web_manager"), self)
+        web_action.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_ComputerIcon))
+        web_action.triggered.connect(self.open_web_manager)
+        
+        paused = self.manager.get_state()['paused']
+        self.tray_pause_action = QAction(self.t("btn_resume_all") if paused else self.t("btn_pause_all"), self)
+        self.tray_pause_action.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_MediaPause if not paused else QStyle.StandardPixmap.SP_MediaPlay))
+        self.tray_pause_action.triggered.connect(self.toggle_pause)
+        
+        quit_action = QAction(self.t("tray_action_quit"), self)
+        quit_action.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DialogCloseButton))
+        quit_action.triggered.connect(self.close)
+        
+        self.tray_menu.addAction(restore_action)
+        self.tray_menu.addAction(web_action)
+        self.tray_menu.addAction(self.tray_pause_action)
+        self.tray_menu.addSeparator()
+        self.tray_menu.addAction(quit_action)
+
+    def changeEvent(self, event):
+        if event.type() == event.Type.WindowStateChange:
+            if not self.isMinimized() and self.isVisible():
+                if self.config.get("clipboard_enabled") and not self.is_clipboard_monitor_active():
+                    self.start_clipboard_monitor()
+        super().changeEvent(event)
