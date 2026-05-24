@@ -1,4 +1,4 @@
-﻿<div align="center">
+<div align="center">
   <img src="assets/icon.png" alt="YouTube Downloader Logo" width="228" height="228">
   <h1>YouTube Downloader</h1>
 
@@ -37,10 +37,10 @@
 
 Project roadmap is available in [ROADMAP.md](ROADMAP.md) and now distinguishes:
 
-- Released versions (completed): `1.0.0`, `1.0.1`, `1.0.2`, `1.1.0`, `1.2.0`, `1.2.1`, `1.2.2`
+- Released versions (completed): `1.0.0`, `1.0.1`, `1.0.2`, `1.1.0`, `1.2.0`, `1.2.1`, `1.2.2`, `1.3.0`
 - Upcoming milestones:
 
-- `1.3.0` Onboarding and support experience
+- `1.4.0` Enhancements and user customizations
 - `2.0.0` Product maturity and extensibility
 
 ---
@@ -72,7 +72,7 @@ Aplicación de escritorio para Windows creada con Python y PyQt6 para gestionar 
 
 ### Requisitos
 - Windows 10/11.
-- Python compatible: >=3.8 y <3.14 (recomendado: 3.11).
+- Python compatible: >=3.8 y <3.15 (recomendado: 3.11).
 - Conexión a Internet.
 - Winget recomendado para instalación automática de Python/FFmpeg.
 
@@ -88,27 +88,21 @@ Los métodos por consola de esta sección se mantienen como alternativa para usu
 
 ### Instalación con un solo comando (PowerShell)
 
-**Opción A — Ya tienes el repositorio clonado o descargado:**
-```powershell
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force; .\install.ps1
-```
+Para instalar de forma remota y ejecutar la aplicación directamente sin necesidad de descargar o clonar el repositorio manualmente, ejecuta el siguiente comando en PowerShell:
 
-**Opción A2 — No tienes el repositorio (bootstrap directo con install.ps1):**
 ```powershell
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force; irm https://raw.githubusercontent.com/wilkinbarban/youtube-downloader/main/install.ps1 | iex
 ```
-> `install.ps1` ahora detecta si faltan archivos del proyecto y, en ese caso, descarga el repo automáticamente al Escritorio (`%USERPROFILE%\Desktop\youtube-downloader`) antes de continuar con la instalación.
 
-**Opción B — Instalación remota directa desde GitHub (sin clonar nada):**
-```powershell
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force; irm https://raw.githubusercontent.com/wilkinbarban/youtube-downloader/main/install_secure.ps1 | iex
-```
-> `install_secure.ps1` descarga el repositorio al Escritorio por defecto (`%USERPROFILE%\Desktop\youtube-downloader`), verifica la integridad del archivo y delega en `install.ps1` localmente. Nunca ejecuta código remoto directamente.
+> **¿Cómo funciona?** El instalador scriptable `install.ps1` valida la presencia del proyecto local. Si no lo detecta, descarga de forma segura el repositorio desde GitHub mediante HTTPS, verifica su integridad en bytes, lo extrae en tu Escritorio (`%USERPROFILE%\Desktop\youtube-downloader`), configura un entorno virtual aislado (`.venv`), instala todas las dependencias necesarias de `requirements.txt` y lanza la aplicación.
 
-### Instalación rápida (alternativa clásica)
-1. Clona o descarga el repositorio.
-2. Ejecuta `Iniciar.bat`.
-3. El script valida Python, crea `.venv`, instala dependencias y abre la app.
+### Alternativa manual (código fuente)
+
+Si prefieres descargar el código fuente y lanzar el proyecto de forma manual:
+
+1. Clona el repositorio: `git clone https://github.com/wilkinbarban/youtube-downloader.git` o descarga el archivo ZIP.
+2. Abre la carpeta del proyecto en Windows.
+3. Ejecuta el archivo `Iniciar.bat`. El script se encargará de validar la versión de Python, construir el entorno virtual `.venv`, instalar las dependencias requeridas e iniciar la interfaz de la aplicación de manera automática.
 
 ### Dependencia FFmpeg
 Si utilizas el `.exe` oficial más reciente, FFmpeg ya va empaquetado con la aplicación. La instalación manual de FFmpeg pasa a ser más relevante solo para uso desde código fuente o métodos basados en scripts.
@@ -138,7 +132,7 @@ Windows desktop application built with Python and PyQt6 to manage YouTube downlo
 
 ### Requirements
 - Windows 10/11.
-- Supported Python: >=3.8 and <3.14 (recommended: 3.11).
+- Supported Python: >=3.8 and <3.15 (recommended: 3.11).
 - Internet connection.
 - Winget recommended for automatic Python/FFmpeg installation.
 
@@ -152,29 +146,23 @@ This executable provides the best experience for non-technical users: it include
 
 Console-based installation methods in this section remain available for advanced users and enthusiasts who prefer a scriptable setup.
 
-### One-command install (PowerShell)
+### One-command installation (PowerShell)
 
-**Option A — You already have the repository cloned or downloaded:**
-```powershell
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force; .\install.ps1
-```
+To install remotely and run the application directly without downloading or cloning the repository manually, execute the following command in PowerShell:
 
-**Option A2 — You do not have the repository yet (direct bootstrap with install.ps1):**
 ```powershell
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force; irm https://raw.githubusercontent.com/wilkinbarban/youtube-downloader/main/install.ps1 | iex
 ```
-> `install.ps1` now detects missing project files and automatically downloads the repo to Desktop (`%USERPROFILE%\Desktop\youtube-downloader`) before continuing installation.
 
-**Option B — Remote install directly from GitHub (no cloning required):**
-```powershell
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force; irm https://raw.githubusercontent.com/wilkinbarban/youtube-downloader/main/install_secure.ps1 | iex
-```
-> `install_secure.ps1` downloads the repository to Desktop by default (`%USERPROFILE%\Desktop\youtube-downloader`), verifies the archive, and delegates to the local `install.ps1`. It never executes arbitrary remote code directly.
+> **How does it work?** The bootstrap installer `install.ps1` checks for the project files locally. If they are missing, it securely downloads the repository from GitHub via HTTPS, checks the byte size for integrity, extracts it to your Desktop (`%USERPROFILE%\Desktop\youtube-downloader`), configures an isolated virtual environment (`.venv`), installs the dependencies from `requirements.txt`, and launches the application.
 
-### Quick start (classic alternative)
-1. Clone or download the repository.
-2. Run `Iniciar.bat`.
-3. The script validates Python, creates `.venv`, installs dependencies, and launches the app.
+### Manual alternative (from source)
+
+If you prefer to download the source code and run the project manually:
+
+1. Clone the repository: `git clone https://github.com/wilkinbarban/youtube-downloader.git` or download the ZIP file.
+2. Open the project folder in Windows Explorer.
+3. Run the `Iniciar.bat` file. This script will automatically validate the Python version, build the `.venv` virtual environment, install the required packages, and launch the application interface.
 
 ### FFmpeg dependency
 If you use the latest official `.exe` release, FFmpeg is already bundled with the application. Manual FFmpeg installation becomes mainly relevant for source-based or script-based setups.
@@ -204,7 +192,7 @@ Aplicativo desktop para Windows, desenvolvido com Python e PyQt6, para gerenciar
 
 ### Requisitos
 - Windows 10/11.
-- Python suportado: >=3.8 e <3.14 (recomendado: 3.11).
+- Python suportado: >=3.8 e <3.15 (recomendado: 3.11).
 - Conexão com a Internet.
 - Winget recomendado para instalação automática de Python/FFmpeg.
 
@@ -220,27 +208,21 @@ Os métodos via console desta seção continuam disponíveis para usuários avan
 
 ### Instalação com um único comando (PowerShell)
 
-**Opção A — Você já tem o repositório clonado ou baixado:**
-```powershell
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force; .\install.ps1
-```
+Para instalar remotamente e executar o aplicativo diretamente, sem necessidade de baixar ou clonar o repositório de forma manual, execute o seguinte comando no PowerShell:
 
-**Opção A2 — Você ainda não tem o repositório (bootstrap direto com install.ps1):**
 ```powershell
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force; irm https://raw.githubusercontent.com/wilkinbarban/youtube-downloader/main/install.ps1 | iex
 ```
-> `install.ps1` agora detecta ausência dos arquivos do projeto e baixa o repositório automaticamente para a Área de Trabalho (`%USERPROFILE%\Desktop\youtube-downloader`) antes de continuar.
 
-**Opção B — Instalação remota diretamente do GitHub (sem clonar):**
-```powershell
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force; irm https://raw.githubusercontent.com/wilkinbarban/youtube-downloader/main/install_secure.ps1 | iex
-```
-> `install_secure.ps1` baixa o repositório para a Área de Trabalho por padrão (`%USERPROFILE%\Desktop\youtube-downloader`), verifica a integridade do arquivo e delega para o `install.ps1` local. Nunca executa código remoto diretamente.
+> **Como funciona?** O script instalador `install.ps1` valida se os arquivos locais do projeto estão presentes. Caso contrário, baixa o repositório de forma segura do GitHub via HTTPS, verifica a integridade do arquivo em bytes, extrai na sua Área de Trabalho (`%USERPROFILE%\Desktop\youtube-downloader`), configura um ambiente virtual isolado (`.venv`), instala os pacotes requeridos de `requirements.txt` e inicia o aplicativo.
 
-### Início rápido (alternativa clássica)
-1. Clone ou baixe o repositório.
-2. Execute `Iniciar.bat`.
-3. O script valida o Python, cria o `.venv`, instala as dependências e inicia o aplicativo.
+### Alternativa manual (código-fonte)
+
+Se preferir baixar o código-fonte e iniciar o projeto manualmente:
+
+1. Clone o repositório: `git clone https://github.com/wilkinbarban/youtube-downloader.git` ou baixe o arquivo ZIP.
+2. Abra a pasta do projeto no Windows.
+3. Execute o arquivo `Iniciar.bat`. O script irá validar a versão do Python, criar o ambiente virtual `.venv`, instalar as dependências e iniciar o aplicativo de maneira automática.
 
 ### Dependência FFmpeg
 Se você usar o `.exe` oficial mais recente, o FFmpeg já vai empacotado com a aplicação. A instalação manual do FFmpeg passa a ser mais relevante apenas para uso via código-fonte ou scripts.
@@ -277,8 +259,7 @@ Seu apoio ajuda a manter melhorias, correções e novos recursos.
 | `src/utils/logging.py` | Logging utilities |
 | `src/config/paths.py` | Shared path helpers |
 | `Iniciar.bat` | Windows bootstrap: validates Python, creates venv, installs deps, launches app |
-| `install.ps1` | PowerShell installer: same flow as Iniciar.bat, scriptable and pipeable |
-| `install_secure.ps1` | Secure remote installer: downloads repo from GitHub, verifies, then runs install.ps1 |
+| `install.ps1` | Unified PowerShell installer: downloads repo from GitHub (if not present), sets up venv, installs requirements, and runs |
 | `requirements.txt` | Python dependencies with version policy |
 | `assets/` | Icons and visual resources |
 | `.github/workflows/ci.yml` | CI pipeline for dependency install and Python compile checks |

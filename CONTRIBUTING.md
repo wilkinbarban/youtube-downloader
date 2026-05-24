@@ -46,7 +46,7 @@ python -m py_compile src\__init__.py src\main\__init__.py src\main\youtube_downl
 - Avoid unrelated refactors in the same pull request.
 - Preserve the native PyQt6 desktop feel unless a UI change is explicitly required.
 - Document user-visible behavior changes in the README or CHANGELOG.
-- Only use libraries fully compatible with Windows and the project's Python policy (`>=3.8, <3.14`).
+- Only use libraries fully compatible with Windows and the project's Python policy (`>=3.8, <3.15`).
 - All new code comments and docstrings must be written in **English**.
 
 ## Pull request checklist

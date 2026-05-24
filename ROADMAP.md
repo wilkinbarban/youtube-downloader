@@ -65,14 +65,25 @@ Support UX modernization and manual update-check release.
 - Added coherent iconography across all menu actions.
 - Updated i18n and docs to reflect support/update workflow changes.
 
+### 1.3.0
+
+Asynchronous Web Manager, Bot-Bypass, and Nebula-Cyberpunk UI.
+
+- Integrated a background FastAPI/Uvicorn server serving a glassmorphic Web Manager at `http://127.0.0.1:8000` with real-time WebSockets and queue controls.
+- Implemented robust browser cookie bypass (supporting Chrome, Firefox, Edge, Brave, and Opera) and local `cookies.txt`/`cookies.json` Netscape converter.
+- Unified PyQt6 desktop interface and secondary dialogs (`ConfigDialog`, `DependenciesDialog`, `HelpDialog`, `SupportDialog`) under a custom Nebula-Cyberpunk style with self-contained SVG checkboxes.
+- Standardized structured exception handling, a type-safe `Result[T, E]` pattern, and exponential backoff retries.
+- Expanded Python runtime policy to officially support Python 3.14.x.
+
 ## Next milestones
 
-## Version 1.3.0
+## Version 1.4.0
 
-Focus: onboarding and support experience.
+Focus: performance and customization.
 
-- Improve first-run guidance and quick-start messaging.
-- Add troubleshooting section for common setup/runtime issues.
+- Implement concurrent downloads options in configuration.
+- Support custom QSS themes switching (e.g. Amber Neon, Aurora Green, Dark Cyberpunk).
+- Add support for custom output naming templates for downloads.
 - Add optional lightweight diagnostics export from Logs tab.
 
 ## Version 2.0.0

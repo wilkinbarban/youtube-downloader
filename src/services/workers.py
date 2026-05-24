@@ -3,7 +3,7 @@
 import os
 import time
 
-from PyQt6.QtCore import QThread, pyqtSignal
+from PyQt6.QtCore import QObject, QThread, pyqtSignal
 
 from src.modules.core import (
     PlaylistExtractor,
@@ -17,8 +17,7 @@ from src.utils.logging import logger
 from src.config.i18n import translate
 
 
-class DownloadCancelled(Exception):
-    pass
+from src.utils.errors import Result, map_ytdlp_error, DownloadCancelled, DownloadError
 
 
 class PlaylistExtractWorker(QThread):
@@ -31,18 +30,20 @@ class PlaylistExtractWorker(QThread):
         self.url = url
 
     def run(self):
-        success, videos, err = PlaylistExtractor.extract_videos(self.url)
-        self.finished.emit(success, videos, err)
+        result = PlaylistExtractor.extract_videos(self.url)
+        if result.success:
+            self.finished.emit(True, result.value, None)
+        else:
+            self.finished.emit(False, [], result.error)
 
 
-class DownloadWorker(QThread):
+import threading
+
+class DownloadWorker(threading.Thread):
     """yt-dlp download worker with progress reporting and cancellation."""
 
-    progress = pyqtSignal(dict)
-    finished = pyqtSignal(dict)
-
     def __init__(self, url, output_path, quality, format_type, language="es"):
-        super().__init__()
+        super().__init__(daemon=True)
         self.url = canonical_video_url(url)
         self.output_path = output_path
         self.quality = quality
@@ -50,6 +51,13 @@ class DownloadWorker(QThread):
         self.language = language
         self.video_title = ""
         self._cancel_requested = False
+        self._progress_cb = None
+        self._finished_cb = None
+        self._last_progress_time = 0
+
+    def set_callbacks(self, progress_cb, finished_cb):
+        self._progress_cb = progress_cb
+        self._finished_cb = finished_cb
 
     def cancel(self):
         self._cancel_requested = True
@@ -60,33 +68,18 @@ class DownloadWorker(QThread):
             success = self._download_with_ytdlp()
             if success:
                 return
-            self.finished.emit(
-                {
-                    "success": False,
-                    "title": self.video_title or self.url,
-                    "error": "yt-dlp no esta disponible o la descarga fallo",
-                    "cancelled": self._cancel_requested,
-                }
-            )
-        except DownloadCancelled:
-            self.finished.emit(
-                {
-                    "success": False,
-                    "title": self.video_title or self.url,
-                    "error": "Descarga cancelada por el usuario",
-                    "cancelled": True,
-                }
-            )
+            if self._finished_cb:
+                self._finished_cb(
+                    Result.fail(DownloadError("La descarga falló o yt-dlp no está disponible"))
+                )
+        except DownloadCancelled as exc:
+            if self._finished_cb:
+                self._finished_cb(Result.fail(exc))
         except Exception as exc:
-            logger.log(f"Error en descarga: {exc}", "ERROR")
-            self.finished.emit(
-                {
-                    "success": False,
-                    "title": self.video_title or self.url,
-                    "error": str(exc),
-                    "cancelled": self._cancel_requested,
-                }
-            )
+            mapped_err = map_ytdlp_error(exc, "Error en descarga")
+            logger.log(str(mapped_err), "ERROR")
+            if self._finished_cb:
+                self._finished_cb(Result.fail(mapped_err))
 
     def _get_yt_dlp_format(self):
         quality_map = {
@@ -113,15 +106,30 @@ class DownloadWorker(QThread):
         # Phase 1: fetch metadata only to obtain the video title.
         # noplaylist=True ensures a single-video result even when the URL
         # contains a list= parameter (e.g. from a playlist or radio link).
+        from src.modules.core import Config, check_and_convert_json_cookies
+        from src.config.paths import BASE_DIR
+        from src.utils.logging import YtdlpLogger
+        
+        check_and_convert_json_cookies()
+        config = Config.load()
+        browser = config.get("cookies_browser", "none")
+        cookies_txt = os.path.join(BASE_DIR, "cookies.txt")
+        use_cookies = os.path.exists(cookies_txt)
+
         ydl_extract_opts = {
             "skip_download": True,
             "quiet": True,
             "no_warnings": True,
             "noplaylist": True,
             "js_runtimes": ytdlp_js_runtimes(),
+            "logger": YtdlpLogger(),
         }
         if ffmpeg_location:
             ydl_extract_opts["ffmpeg_location"] = ffmpeg_location
+        if use_cookies:
+            ydl_extract_opts["cookiefile"] = cookies_txt
+        elif browser != "none":
+            ydl_extract_opts["cookiesfrombrowser"] = (browser, None, None, None)
 
         with yt_dlp.YoutubeDL(ydl_extract_opts) as ydl_extract:
             info_only = ydl_extract.extract_info(self.url, download=False)
@@ -141,11 +149,16 @@ class DownloadWorker(QThread):
             "noplaylist": True,
             "restrictfilenames": True,
             "js_runtimes": ytdlp_js_runtimes(),
+            "logger": YtdlpLogger(),
         }
         if ffmpeg_location:
             ydl_opts["ffmpeg_location"] = ffmpeg_location
         if self.quality != "audio":
             ydl_opts["merge_output_format"] = merge_fmt
+        if use_cookies:
+            ydl_opts["cookiefile"] = cookies_txt
+        elif browser != "none":
+            ydl_opts["cookiesfrombrowser"] = (browser, None, None, None)
 
         # Phase 2: download using a fresh extract_info call (not process_ie_result).
         # Passing pre-extracted info across YoutubeDL instances via process_ie_result
@@ -157,14 +170,12 @@ class DownloadWorker(QThread):
             self._ensure_not_cancelled()
             title = (info or info_only).get("title", self.video_title or "Unknown")
             logger.log(f"Descarga exitosa: {title}", "SUCCESS")
-            self.finished.emit(
-                {
-                    "success": True,
-                    "title": title,
-                    "error": None,
-                    "cancelled": False,
-                }
-            )
+            if self._finished_cb:
+                self._finished_cb(
+                    Result.ok({
+                        "title": title,
+                    })
+                )
             return True
 
     def _progress_hook_ytdlp(self, data):
@@ -172,30 +183,39 @@ class DownloadWorker(QThread):
         if data["status"] == "downloading":
             total = data.get("total_bytes") or data.get("total_bytes_estimate") or 0
             downloaded = data.get("downloaded_bytes", 0)
+            percent = (downloaded / total) * 100 if total > 0 else 0
+            
+            now = time.time()
+            # Allow progress callback only if 0.3s has elapsed or percent is near 100%
+            if now - self._last_progress_time < 0.3 and percent < 99.9:
+                return
+            
+            self._last_progress_time = now
             speed = data.get("speed", 0)
             eta = data.get("eta", 0)
-            percent = (downloaded / total) * 100 if total > 0 else 0
-            self.progress.emit(
-                {
-                    "downloaded": downloaded,
-                    "total": total,
-                    "speed": speed,
-                    "eta": eta,
-                    "percent": percent,
-                    "status_key": "status_downloading",
-                }
-            )
+            if self._progress_cb:
+                self._progress_cb(
+                    {
+                        "downloaded": downloaded,
+                        "total": total,
+                        "speed": speed,
+                        "eta": eta,
+                        "percent": percent,
+                        "status_key": "status_downloading",
+                    }
+                )
         elif data["status"] == "finished":
-            self.progress.emit(
-                {
-                    "downloaded": data.get("downloaded_bytes", 0),
-                    "total": data.get("total_bytes", 0),
-                    "speed": 0,
-                    "eta": 0,
-                    "percent": 100,
-                    "status_key": "status_processing",
-                }
-            )
+            if self._progress_cb:
+                self._progress_cb(
+                    {
+                        "downloaded": data.get("downloaded_bytes", 0),
+                        "total": data.get("total_bytes", 0),
+                        "speed": 0,
+                        "eta": 0,
+                        "percent": 100,
+                        "status_key": "status_processing",
+                    }
+                )
 
 
 class ClipboardMonitor(QThread):
@@ -268,3 +288,58 @@ class DependencyInstallWorker(QThread):
 
         success, message = DependencyManager.install_all_missing(progress_callback=report)
         self.finished.emit(success, message)
+
+
+import asyncio
+import uvicorn
+
+
+class FolderPickerRequest:
+    """Thread-safe container for a folder picker request from the web."""
+    def __init__(self):
+        self.event = threading.Event()
+        self.result = None
+
+
+class WebBridge(QObject):
+    """Thread-safe bridge between FastAPI HTTP threads and the PyQt6 main thread."""
+    browse_folder_requested = pyqtSignal(object)
+    _instance = None
+    _lock = threading.Lock()
+
+    @classmethod
+    def get_instance(cls):
+        with cls._lock:
+            if cls._instance is None:
+                cls._instance = cls()
+        return cls._instance
+
+
+class FastApiServerWorker(QThread):
+    """Hilo secundario dedicado a mantener vivo el servidor FastAPI sin congelar PyQt6."""
+
+    def __init__(self, host="127.0.0.1", port=8000):
+        super().__init__()
+        self.host = host
+        self.port = port
+        self.server = None
+
+    def run(self):
+        logger.log(f"Iniciando API Web en http://{self.host}:{self.port}", "INFO")
+        config = uvicorn.Config(
+            app="src.web.app:app",
+            host=self.host,
+            port=self.port,
+            loop="asyncio",
+            log_level="info",
+            ws_ping_interval=None,
+            ws_ping_timeout=None
+        )
+        self.server = uvicorn.Server(config)
+        asyncio.run(self.server.serve())
+
+    def stop(self):
+        if self.server:
+            self.server.should_exit = True
+            logger.log("Servidor FastAPI detenido.", "INFO")
+

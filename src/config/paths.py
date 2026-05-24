@@ -19,6 +19,7 @@ APP_ICON_PNG = os.path.join(ASSETS_DIR, "icon.png")
 APP_ICON = APP_ICON_ICO if os.path.exists(APP_ICON_ICO) else APP_ICON_PNG
 
 QR_PAYPAL = os.path.join(ASSETS_DIR, "QR_Paypal.png")
+WEB_STATIC_DIR = resource_path("src", "web", "static")
 
 BUNDLED_FFMPEG_DIR = resource_path("ffmpeg", "bin")
 BUNDLED_FFMPEG_EXE = os.path.join(BUNDLED_FFMPEG_DIR, "ffmpeg.exe")

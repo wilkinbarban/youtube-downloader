@@ -4,7 +4,7 @@
     YouTube Downloader - One-command installer and launcher for Windows.
 
 .DESCRIPTION
-    Validates the Python runtime (requires >=3.8, <3.14; prefers 3.11),
+    Validates the Python runtime (requires >=3.8, <3.15; prefers 3.11),
     creates an isolated virtual environment, installs all dependencies,
     and launches the application.
 
@@ -16,8 +16,8 @@
     # Run from PowerShell (no clone needed if you use the remote variant):
     .\install.ps1
 
-    # Or directly from GitHub (see install_secure.ps1 for the safe remote variant):
-    irm https://raw.githubusercontent.com/wilkinbarban/youtube-downloader/main/install_secure.ps1 | iex
+    # Or directly from GitHub:
+    irm https://raw.githubusercontent.com/wilkinbarban/youtube-downloader/main/install.ps1 | iex
 
 .NOTES
     Platform : Windows 10/11
@@ -29,9 +29,138 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
-# Resolve a safe base path for all file operations.
-# In "irm ... | iex" execution contexts, $PSScriptRoot and $PSCommandPath
-# may be empty, so we fall back to current location and finally '.'
+$Version = "1.3.0"
+
+# 1. Host settings
+$Host.UI.RawUI.WindowTitle = "YouTube Downloader - Instalando..."
+Clear-Host
+
+Write-Host ""
+Write-Host "  *** Y O U T U B E   D O W N L O A D E R  ***" -ForegroundColor Magenta
+Write-Host "  ========================================" -ForegroundColor DarkCyan
+Write-Host "   Instalador y Lanzador - Version $Version" -ForegroundColor Gray
+Write-Host "  ========================================" -ForegroundColor DarkCyan
+Write-Host ""
+
+# Status indicator helper
+function Show-Step {
+    param (
+        [string]$Message
+    )
+    Write-Host "  >> $Message..." -ForegroundColor Gray
+}
+
+# Error presentation helper
+function Show-Error {
+    param (
+        [string]$Title,
+        [string]$Detail,
+        [string]$Action
+    )
+    Write-Host ""
+    Write-Host "  [ERROR] $Title" -ForegroundColor Red
+    Write-Host "  --------------------------------------------------------" -ForegroundColor Red
+    Write-Host "   Detalle : $Detail" -ForegroundColor Yellow
+    Write-Host "   Accion  : $Action" -ForegroundColor Cyan
+    Write-Host "  --------------------------------------------------------" -ForegroundColor Red
+    Write-Host ""
+    Read-Host "  Presione Enter para salir..."
+    exit 1
+}
+
+# Lightweight execution runner with progress spinner and real-time package feedback
+function Run-WithProgress {
+    param (
+        [string]$FileName,
+        [string]$Arguments,
+        [string]$Message
+    )
+    $pinfo = New-Object System.Diagnostics.ProcessStartInfo
+    $pinfo.FileName = $FileName
+    $pinfo.Arguments = $Arguments
+    $pinfo.RedirectStandardOutput = $true
+    $pinfo.RedirectStandardError = $true
+    $pinfo.UseShellExecute = $false
+    $pinfo.CreateNoWindow = $true
+    
+    $p = New-Object System.Diagnostics.Process
+    $p.StartInfo = $pinfo
+    
+    $stdoutList = New-Object System.Collections.Generic.List[string]
+    $stderrList = New-Object System.Collections.Generic.List[string]
+    
+    # Register events for non-blocking stream capture
+    $p.EnableRaisingEvents = $true
+    
+    $outEvent = Register-ObjectEvent -InputObject $p -EventName "OutputDataReceived" -Action {
+        if ($EventArgs.Data) {
+            $Event.MessageData.Add($EventArgs.Data)
+            $script:LastRawLine = $EventArgs.Data
+        }
+    } -MessageData $stdoutList
+    
+    $errEvent = Register-ObjectEvent -InputObject $p -EventName "ErrorDataReceived" -Action {
+        if ($EventArgs.Data) {
+            $Event.MessageData.Add($EventArgs.Data)
+        }
+    } -MessageData $stderrList
+    
+    try {
+        $script:LastRawLine = ""
+        $p.Start() | Out-Null
+        $p.BeginOutputReadLine()
+        $p.BeginErrorReadLine()
+    } catch {
+        return @{ Success = $false; Error = $_.Exception.Message }
+    }
+    
+    $spinner = @('|', '/', '-', '\')
+    $i = 0
+    while (-not $p.HasExited) {
+        $displayMessage = $Message
+        $lastLine = $script:LastRawLine
+        if ($lastLine) {
+            if ($lastLine -match 'Downloading\s+([a-zA-Z0-9_\-\.]+)') {
+                $displayMessage = "Descargando $($Matches[1])"
+            } elseif ($lastLine -match 'Installing collected packages:\s*(.*)') {
+                $displayMessage = "Instalando paquetes"
+            } elseif ($lastLine -match 'Requirement already satisfied:\s*([a-zA-Z0-9_\-\.\:\(\)\ ]+)') {
+                $matched = $Matches[1]
+                if ($matched -match '^([a-zA-Z0-9_\-]+)') {
+                    $displayMessage = "Verificando $($Matches[1])"
+                }
+            }
+        }
+        
+        # Limit message length to fit beautifully in standard terminal
+        if ($displayMessage.Length -gt 50) {
+            $displayMessage = $displayMessage.Substring(0, 47) + "..."
+        }
+        
+        Write-Host -NoNewline "`r  $($spinner[$i]) $displayMessage..." -ForegroundColor Cyan
+        Start-Sleep -Milliseconds 100
+        $i = ($i + 1) % $spinner.Count
+    }
+    
+    Unregister-Event -SourceIdentifier $outEvent.Name -ErrorAction SilentlyContinue
+    Unregister-Event -SourceIdentifier $errEvent.Name -ErrorAction SilentlyContinue
+    
+    $stdout = $stdoutList -join "`n"
+    $stderr = $stderrList -join "`n"
+    $exitCode = $p.ExitCode
+    
+    Write-Host -NoNewline "`r                                                                              `r"
+    
+    if ($exitCode -eq 0) {
+        Write-Host "  [OK] $Message [Completado]" -ForegroundColor Green
+        return @{ Success = $true; Stdout = $stdout }
+    } else {
+        Write-Host "  [FAIL] $Message [Fallo]" -ForegroundColor Red
+        return @{ Success = $false; Stdout = $stdout; Stderr = $stderr; ExitCode = $exitCode }
+    }
+}
+
+# Resolve a safe base path for all file operations
 $ScriptRootCandidates = @(
     $PSScriptRoot,
     $(if (-not [string]::IsNullOrWhiteSpace($PSCommandPath)) { Split-Path -Parent $PSCommandPath }),
@@ -48,30 +177,10 @@ foreach ($candidate in $ScriptRootCandidates) {
 }
 
 if ([string]::IsNullOrWhiteSpace($ScriptRoot)) {
-    Write-Fail "Unable to resolve a valid working directory for installation."
-    exit 1
+    Show-Error "Error de Directorio" "No se pudo determinar el directorio de trabajo." "Ejecute el instalador desde un directorio con permisos de lectura y escritura."
 }
 
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
-function Write-Step  { param([string]$Msg) Write-Host "[....] $Msg" -ForegroundColor Cyan }
-function Write-Ok    { param([string]$Msg) Write-Host "[ OK ] $Msg" -ForegroundColor Green }
-function Write-Warn  { param([string]$Msg) Write-Host "[WARN] $Msg" -ForegroundColor Yellow }
-function Write-Fail  { param([string]$Msg) Write-Host "[FAIL] $Msg" -ForegroundColor Red }
-function Write-Info  { param([string]$Msg) Write-Host "[INFO] $Msg" -ForegroundColor Gray }
-
-Write-Host ""
-Write-Host "=======================================================" -ForegroundColor Cyan
-Write-Host "  YouTube Downloader - Installer / Launcher (Windows)" -ForegroundColor Cyan
-Write-Host "  Educational project - GPL-3.0 License" -ForegroundColor Cyan
-Write-Host "=======================================================" -ForegroundColor Cyan
-Write-Host ""
-
-# ---------------------------------------------------------------------------
-# Bootstrap mode: if this script is executed outside the project root,
-# download/update the repository first and then delegate to local install.
-# ---------------------------------------------------------------------------
+# --- Step A: Bootstrap mode verification ---
 $RequiredFiles = @('src\main\youtube_downloader.py', 'requirements.txt')
 $IsProjectRoot = $true
 foreach ($file in $RequiredFiles) {
@@ -82,9 +191,9 @@ foreach ($file in $RequiredFiles) {
 }
 
 if (-not $IsProjectRoot) {
-    Write-Warn "Project files were not found next to install.ps1."
-    Write-Info "Switching to bootstrap mode: downloading repository from GitHub..."
-
+    Write-Host "  [!] Archivos de proyecto no encontrados en el directorio actual." -ForegroundColor Yellow
+    Write-Host "  [INFO] Entrando a modo Bootstrapper remoto: descargando repositorio..." -ForegroundColor Cyan
+    
     $RepoOwner   = 'wilkinbarban'
     $RepoName    = 'youtube-downloader'
     $Branch      = 'main'
@@ -97,31 +206,41 @@ if (-not $IsProjectRoot) {
     $TempZip     = Join-Path $env:TEMP "$RepoName-$Branch.zip"
     $TempExtract = Join-Path $env:TEMP "$RepoName-bootstrap-$(Get-Random)"
 
-    Write-Step "Downloading repository archive..."
-    Invoke-WebRequest -Uri $ArchiveUrl -OutFile $TempZip -UseBasicParsing
-
-    $zipSize = (Get-Item $TempZip).Length
-    if ($zipSize -lt 1024) {
-        Write-Fail "Downloaded archive appears invalid (size: $zipSize bytes)."
-        Remove-Item -Force $TempZip -ErrorAction SilentlyContinue
-        exit 1
+    # Download Repository Zip
+    $dlArgs = "-NoProfile -Command `"Invoke-WebRequest -Uri '$ArchiveUrl' -OutFile '$TempZip' -UseBasicParsing`""
+    $dlRes = Run-WithProgress "powershell" $dlArgs "Descargando repositorio de GitHub"
+    if (-not $dlRes.Success) {
+        Show-Error "Fallo de Descarga" "No se pudo descargar el repositorio desde GitHub." "Verifique su conexion a Internet y que github.com sea accesible."
     }
 
-    Write-Step "Extracting repository archive..."
+    # Verify Zip Size
+    $zipSize = (Get-Item $TempZip).Length
+    if ($zipSize -lt 1024) {
+        Remove-Item -Force $TempZip -ErrorAction SilentlyContinue
+        Show-Error "Integridad Invalida" "El archivo descargado es invalido o corrupto." "Vuelva a intentar la ejecucion."
+    }
+
+    # Extract Zip File
     $null = New-Item -ItemType Directory -Path $TempExtract -Force
-    Expand-Archive -Path $TempZip -DestinationPath $TempExtract -Force
+    $extArgs = "-NoProfile -Command `"Expand-Archive -Path '$TempZip' -DestinationPath '$TempExtract' -Force`""
+    $extRes = Run-WithProgress "powershell" $extArgs "Extrayendo repositorio del instalador"
     Remove-Item -Force $TempZip -ErrorAction SilentlyContinue
+    
+    if (-not $extRes.Success) {
+        Remove-Item -Recurse -Force $TempExtract -ErrorAction SilentlyContinue
+        Show-Error "Extraccion Fallida" "No se pudo descomprimir el archivo del repositorio." "Asegurese de contar con espacio en disco."
+    }
 
     $ExtractedRoot = Join-Path $TempExtract "$RepoName-$Branch"
     if (-not (Test-Path $ExtractedRoot)) {
-        Write-Fail "Expected folder '$ExtractedRoot' not found after extraction."
         Remove-Item -Recurse -Force $TempExtract -ErrorAction SilentlyContinue
-        exit 1
+        Show-Error "Estructura Invalida" "La carpeta esperada tras la extraccion no existe." "Vuelva a intentar la ejecucion."
     }
 
-    Write-Step "Installing repository to: $InstallDir"
+    # Move files to final directory
+    Show-Step "Instalando archivos del repositorio"
     if (Test-Path $InstallDir) {
-        Write-Warn "Target already exists. Updating in-place (existing .venv preserved)."
+        Write-Host "  [!] Carpeta destino existente. Actualizando archivos en-lugar..." -ForegroundColor Yellow
         Get-ChildItem -Path $ExtractedRoot | Where-Object { $_.Name -ne '.venv' } | ForEach-Object {
             $dest = Join-Path $InstallDir $_.Name
             Copy-Item -Path $_.FullName -Destination $dest -Recurse -Force
@@ -129,144 +248,160 @@ if (-not $IsProjectRoot) {
     } else {
         Move-Item -Path $ExtractedRoot -Destination $InstallDir
     }
-
     Remove-Item -Recurse -Force $TempExtract -ErrorAction SilentlyContinue
 
     $LocalInstaller = Join-Path $InstallDir 'install.ps1'
     if (-not (Test-Path $LocalInstaller)) {
-        Write-Fail "install.ps1 not found in $InstallDir after bootstrap."
-        exit 1
+        Show-Error "Script Faltante" "El script install.ps1 no se encontro en el directorio instalado." "Reporte este error al autor del proyecto."
     }
 
-    Write-Ok "Repository ready. Delegating to local installer..."
+    Write-Host "  [OK] Repositorio instalado con exito." -ForegroundColor Green
+    Write-Host "  [INFO] Delegando arranque al instalador local..." -ForegroundColor Cyan
     Set-Location $InstallDir
     & $LocalInstaller
     exit $LASTEXITCODE
 }
 
-# ---------------------------------------------------------------------------
-# 1. Locate a compatible Python runtime (>=3.8, <3.14; prefer 3.11)
-# ---------------------------------------------------------------------------
-Write-Step "Locating compatible Python runtime..."
+# --- Step 1: Detect Python Environment ---
+Show-Step "Verificando entorno de Python"
 
-$PythonCmd = $null
-
-# Try py -3.11 first (Windows Python Launcher)
-try {
-    $null = & py -3.11 --version 2>&1
-    if ($LASTEXITCODE -eq 0) {
-        $PythonCmd = @('py', '-3.11')
-        Write-Ok "Python 3.11 found via py launcher."
-    }
-} catch { <# not available #> }
-
-# Fallback: python in PATH if version is compatible
-if (-not $PythonCmd) {
+$pythonCmd = $null
+$launchers = @("py -3.11", "py -3.12", "py -3.10", "py -3.9", "py -3.8", "py -3.13", "py -3.14")
+foreach ($launcher in $launchers) {
     try {
-        $null = & python --version 2>&1
-        if ($LASTEXITCODE -eq 0) {
-            $null = & python -c "import sys; raise SystemExit(0 if (3,8) <= sys.version_info < (3,14) else 1)" 2>&1
-            if ($LASTEXITCODE -eq 0) {
-                $PythonCmd = @('python')
-                Write-Ok "Compatible Python found in PATH."
-            } else {
-                Write-Warn "Python in PATH is outside the supported range (>=3.8, <3.14)."
+        $parts = $launcher -split " "
+        $cmd = $parts[0]
+        $arg = $parts[1]
+        $res = & $cmd $arg --version 2>&1
+        if ($lastExitCode -eq 0 -and $res -match 'Python\s+([0-9\.]+)') {
+            $pythonCmd = $launcher
+            break
+        }
+    } catch {}
+}
+
+if (-not $pythonCmd) {
+    try {
+        $res = & python --version 2>&1
+        if ($lastExitCode -eq 0 -and $res -match 'Python\s+([0-9\.]+)') {
+            $ver = [version]$Matches[1]
+            if ($ver -ge [version]"3.8" -and $ver -lt [version]"3.15") {
+                $pythonCmd = "python"
             }
         }
-    } catch { <# not available #> }
+    } catch {}
 }
 
-# Last resort: install Python 3.11 via winget
-if (-not $PythonCmd) {
-    Write-Info "No compatible Python found. Attempting automatic install via winget..."
-    if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
-        Write-Fail "winget is not available. Install Python 3.11 manually from https://www.python.org/downloads/"
-        Write-Fail "Make sure to check 'Add Python to PATH' during installation."
-        exit 1
+# Install Python 3.11 automatically if missing
+if (-not $pythonCmd) {
+    Write-Host "  [!] Python compatible (3.8 a 3.14) no detectado en el sistema." -ForegroundColor Yellow
+    
+    $wingetCheck = Get-Command winget -ErrorAction SilentlyContinue
+    if (-not $wingetCheck) {
+        Show-Error "Python No Encontrado" "No se encontro Python ni el instalador winget en el sistema." "Instale manualmente Python 3.11 desde https://www.python.org/downloads/ (marcando 'Add Python to PATH')."
     }
-    & winget install --id Python.Python.3.11 --accept-source-agreements --accept-package-agreements
-    if ($LASTEXITCODE -ne 0) {
-        Write-Fail "winget installation failed. Please install Python 3.11 manually."
-        exit 1
+    
+    $installRes = Run-WithProgress "winget" "install --id Python.Python.3.11 --accept-source-agreements --accept-package-agreements" "Instalando Python 3.11"
+    if (-not $installRes.Success) {
+        Show-Error "Instalacion de Python Fallida" "Fallo al instalar Python 3.11 mediante winget." "Por favor, realice la instalacion manual desde el sitio web de Python."
     }
-    # Refresh PATH for the current session
-    $env:PATH = [System.Environment]::GetEnvironmentVariable('PATH', 'Machine') + ';' +
-                [System.Environment]::GetEnvironmentVariable('PATH', 'User')
+    
+    # Reload environment path for the current process
+    $env:PATH = [System.Environment]::GetEnvironmentVariable('PATH', 'Machine') + ';' + [System.Environment]::GetEnvironmentVariable('PATH', 'User')
+    
+    foreach ($launcher in $launchers) {
+        try {
+            $parts = $launcher -split " "
+            $cmd = $parts[0]
+            $arg = $parts[1]
+            $res = & $cmd $arg --version 2>&1
+            if ($lastExitCode -eq 0 -and $res -match 'Python\s+([0-9\.]+)') {
+                $pythonCmd = $launcher
+                break
+            }
+        } catch {}
+    }
+    
+    if (-not $pythonCmd) {
+        Show-Error "Reinicio de Consola Requerido" "Python fue instalado correctamente pero la terminal actual aun no reconoce el comando." "Cierre todas las ventanas de consola abiertas y vuelva a ejecutar install.ps1."
+    }
+}
+
+Write-Host "  [OK] Python base detectado ($pythonCmd)" -ForegroundColor Green
+
+# --- Step 2: Virtual Environment Setup ---
+$venvDir = Join-Path $ScriptRoot '.venv'
+$venvPython = Join-Path $venvDir 'Scripts\python.exe'
+$venvPip = Join-Path $venvDir 'Scripts\pip.exe'
+$recreateVenv = $false
+
+if (Test-Path $venvPython) {
     try {
-        $null = & py -3.11 --version 2>&1
-        if ($LASTEXITCODE -eq 0) {
-            $PythonCmd = @('py', '-3.11')
-            Write-Ok "Python 3.11 installed and ready."
+        $res = & $venvPython --version 2>&1
+        if ($res -match 'Python\s+([0-9\.]+)') {
+            $ver = [version]$Matches[1]
+            if ($ver -lt [version]"3.8" -or $ver -ge [version]"3.15") {
+                $recreateVenv = $true
+            }
+        } else {
+            $recreateVenv = $true
         }
-    } catch { }
-    if (-not $PythonCmd) {
-        Write-Warn "Python was installed but is not yet visible in this session."
-        Write-Info "Please close this window and run the script again."
-        exit 1
+    } catch {
+        $recreateVenv = $true
     }
 }
 
-# ---------------------------------------------------------------------------
-# 2. Create or validate virtual environment
-# ---------------------------------------------------------------------------
-Write-Host ""
-Write-Step "Setting up virtual environment (.venv)..."
-
-$VenvDir    = Join-Path $ScriptRoot '.venv'
-$VenvPython = Join-Path $VenvDir 'Scripts\python.exe'
-$VenvPip    = Join-Path $VenvDir 'Scripts\pip.exe'
-
-# Recreate venv if it was built with a Python outside the supported range.
-if (Test-Path $VenvPython) {
-    $null = & $VenvPython -c "import sys; raise SystemExit(0 if (3,8) <= sys.version_info < (3,14) else 1)" 2>&1
-    if ($LASTEXITCODE -ne 0) {
-        Write-Warn "Existing .venv uses an incompatible Python version. Recreating..."
-        Remove-Item -Recurse -Force $VenvDir
-    }
+if ($recreateVenv) {
+    Write-Host "  [!] Entorno virtual incompatible detectado. Recreando .venv..." -ForegroundColor Yellow
+    Remove-Item -Path $venvDir -Recurse -Force -ErrorAction SilentlyContinue
 }
 
-if (-not (Test-Path $VenvPython)) {
-    Write-Info "Creating isolated virtual environment..."
-    if ($PythonCmd.Count -gt 1) {
-        & $PythonCmd[0] $PythonCmd[1] -m venv $VenvDir
-    } else {
-        & $PythonCmd[0] -m venv $VenvDir
+if (-not (Test-Path $venvPython)) {
+    $parts = $pythonCmd -split " "
+    $cmd = $parts[0]
+    $venvArgs = if ($parts.Length -gt 1) { "$($parts[1]) -m venv $venvDir" } else { "-m venv $venvDir" }
+    
+    $venvRes = Run-WithProgress $cmd $venvArgs "Creando entorno virtual (.venv)"
+    if (-not $venvRes.Success) {
+        Show-Error "Error de Entorno Virtual" "No se pudo crear la carpeta .venv." "Verifique permisos de escritura en la carpeta del proyecto o intente ejecutar: python -m venv .venv"
     }
-    if ($LASTEXITCODE -ne 0) {
-        Write-Fail "Failed to create virtual environment."
-        exit 1
-    }
-    Write-Ok "Virtual environment created."
 } else {
-    Write-Ok "Virtual environment already exists."
+    Write-Host "  [OK] Entorno virtual detectado (.venv)" -ForegroundColor Green
 }
 
-# ---------------------------------------------------------------------------
-# 3. Install / update dependencies
-# ---------------------------------------------------------------------------
-Write-Host ""
-Write-Step "Installing dependencies..."
+# --- Step 3: Dependencies Check & Installation ---
+Show-Step "Comprobando dependencias del sistema"
 
-& $VenvPython -m pip install --upgrade pip --quiet
-& $VenvPip install -r (Join-Path $ScriptRoot 'requirements.txt')
-if ($LASTEXITCODE -ne 0) {
-    Write-Fail "Dependency installation failed. Check the output above for details."
-    exit 1
+# Disable global pip installation to enforce isolated venv
+$env:PIP_USER = "no"
+
+# Upgrade pip quietly
+$pipUpgrade = Run-WithProgress $venvPython "-m pip install --no-input --upgrade pip" "Actualizando instalador pip"
+
+# Check dependencies from requirements.txt
+$ReqPath = Join-Path $ScriptRoot "requirements.txt"
+if (Test-Path $ReqPath) {
+    $depsRes = Run-WithProgress $venvPip "install --no-input -r `"$ReqPath`"" "Instalando dependencias de Python"
+    if (-not $depsRes.Success) {
+        $logFile = Join-Path $venvDir "install.log"
+        $depsRes.Stderr | Out-File -FilePath $logFile -Encoding utf8
+        Show-Error "Error en Dependencias" "Fallo al instalar paquetes de requirements.txt." "Consulte el archivo de log en: $logFile`nIntente ejecutar manualmente: .venv\Scripts\pip.exe install -r requirements.txt"
+    }
+} else {
+    Write-Host "  [!] requirements.txt no encontrado. Omitiendo instalacion de dependencias." -ForegroundColor Yellow
 }
-Write-Ok "All dependencies are up to date."
 
-# ---------------------------------------------------------------------------
-# 4. Launch application
-# ---------------------------------------------------------------------------
-Write-Host ""
-Write-Ok "Launching YouTube Downloader..."
+# --- Step 4: Run Application ---
+Write-Host "  >>> Iniciando YouTube Downloader..." -ForegroundColor Magenta
 Write-Host ""
 
-& $VenvPython -m src.main.youtube_downloader
-
-if ($LASTEXITCODE -ne 0) {
-    Write-Host ""
-    Write-Fail "Application exited unexpectedly (exit code $LASTEXITCODE)."
-    Write-Info "Check the Logs tab or the output above for details."
-    exit $LASTEXITCODE
+try {
+    # Launch in background and wait, showing direct app output
+    $proc = Start-Process -FilePath $venvPython -ArgumentList "-m src.main.youtube_downloader" -NoNewWindow -PassThru -Wait
+    $exitCode = $proc.ExitCode
+    if ($exitCode -ne 0) {
+        Show-Error "Ejecucion Fallida" "La aplicacion finalizo con un codigo de error inesperado ($exitCode)." "Consulte la salida anterior o los archivos de log de la aplicacion para mas detalles."
+    }
+} catch {
+    Show-Error "Fallo Critico al Iniciar" $_.Exception.Message "Compruebe que el entorno virtual no este danado e intente re-ejecutar el script."
 }

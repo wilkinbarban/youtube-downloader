@@ -13,6 +13,7 @@ from urllib.parse import parse_qs, urlencode, urlparse
 from src.config.i18n import translate
 from src.utils.logging import logger
 from src.config.paths import CONFIG_FILE
+from src.utils.errors import Result, map_ytdlp_error, ExtractionError, ConfigError
 
 
 QUALITY_OPTIONS = ["4k", "1080p", "720p", "480p", "360p", "best", "audio"]
@@ -182,6 +183,74 @@ class VideoDownloadTask:
         return self.attempt < self.max_attempts
 
 
+def check_and_convert_json_cookies():
+    """Convert cookies.json to Netscape cookies.txt format if it exists."""
+    from src.config.paths import BASE_DIR
+    import time
+
+    json_path = os.path.join(BASE_DIR, "cookies.json")
+    txt_path = os.path.join(BASE_DIR, "cookies.txt")
+
+    if not os.path.exists(json_path):
+        return False
+
+    try:
+        # Check if json was updated after txt, or if txt doesn't exist
+        if os.path.exists(txt_path):
+            json_time = os.path.getmtime(json_path)
+            txt_time = os.path.getmtime(txt_path)
+            if txt_time >= json_time:
+                # cookies.txt is already up to date
+                return True
+
+        with open(json_path, "r", encoding="utf-8") as f:
+            cookies = json.load(f)
+
+        if not isinstance(cookies, list):
+            logger.log("El archivo cookies.json no tiene el formato esperado (debe ser una lista).", "WARNING")
+            return False
+
+        lines = [
+            "# Netscape HTTP Cookie File\n",
+            "# This file was automatically converted from cookies.json by YouTube Downloader.\n\n"
+        ]
+
+        count = 0
+        for cookie in cookies:
+            domain = cookie.get("domain", "")
+            if not domain:
+                continue
+
+            is_httponly = cookie.get("httpOnly", False)
+            domain_prefix = "#HttpOnly_" if is_httponly else ""
+
+            flag = "TRUE" if domain.startswith(".") else "FALSE"
+            path = cookie.get("path", "/")
+            secure = "TRUE" if cookie.get("secure", False) else "FALSE"
+
+            expiration = cookie.get("expirationDate")
+            if expiration is None:
+                expiration = int(time.time() + 31536000) # 1 year default
+            else:
+                expiration = int(expiration)
+
+            name = cookie.get("name", "")
+            value = cookie.get("value", "")
+
+            # Columns: domain, flag, path, secure, expiration, name, value
+            lines.append(f"{domain_prefix}{domain}\t{flag}\t{path}\t{secure}\t{expiration}\t{name}\t{value}\n")
+            count += 1
+
+        with open(txt_path, "w", encoding="utf-8") as f:
+            f.writelines(lines)
+
+        logger.log(f"Cookies importadas con éxito: se convirtieron {count} cookies de cookies.json a Netscape cookies.txt.", "SUCCESS")
+        return True
+    except Exception as e:
+        logger.log(f"Error al importar cookies.json: {e}", "WARNING")
+        return False
+
+
 class PlaylistExtractor:
     """Extract playable entries from playlists or equivalent URLs."""
 
@@ -202,7 +271,7 @@ class PlaylistExtractor:
         return None
 
     @staticmethod
-    def extract_videos(url):
+    def extract_videos(url) -> Result[list, ExtractionError]:
         try:
             import yt_dlp
 
@@ -222,6 +291,13 @@ class PlaylistExtractor:
                     "INFO",
                 )
 
+            from src.config.paths import BASE_DIR
+            from src.utils.logging import YtdlpLogger
+            check_and_convert_json_cookies()
+            config = Config.load()
+            browser = config.get("cookies_browser", "none")
+            cookies_txt = os.path.join(BASE_DIR, "cookies.txt")
+            use_cookies = os.path.exists(cookies_txt)
             ydl_opts = {
                 "extract_flat": True,
                 "quiet": True,
@@ -230,12 +306,17 @@ class PlaylistExtractor:
                 "socket_timeout": 30,
                 "ignoreerrors": True,
                 "js_runtimes": ytdlp_js_runtimes(),
+                "logger": YtdlpLogger(),
             }
+            if use_cookies:
+                ydl_opts["cookiefile"] = cookies_txt
+            elif browser != "none":
+                ydl_opts["cookiesfrombrowser"] = (browser, None, None, None)
 
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 info = ydl.extract_info(source_url, download=False)
                 if info is None:
-                    return False, [], "No se pudo obtener informacion de la URL"
+                    return Result.fail(ExtractionError("No se pudo obtener informacion de la URL"))
 
                 entries = info.get("entries")
                 if entries is not None:
@@ -254,10 +335,8 @@ class PlaylistExtractor:
                             }
                         )
                     if not videos:
-                        return (
-                            False,
-                            [],
-                            "La lista no tiene videos validos o todos estan no disponibles",
+                        return Result.fail(
+                            ExtractionError("La lista no tiene videos validos o todos estan no disponibles")
                         )
 
                     playlist_title = info.get("title", "Playlist")
@@ -265,7 +344,7 @@ class PlaylistExtractor:
                         f"Playlist detectada: {playlist_title} ({len(videos)} videos)",
                         "INFO",
                     )
-                    return True, videos, None
+                    return Result.ok(videos)
 
                 vid = info.get("id") or PlaylistExtractor._entry_video_id(info)
                 single_video = {
@@ -274,11 +353,11 @@ class PlaylistExtractor:
                     "index": 1,
                 }
                 logger.log(f"Video individual detectado: {single_video['title']}", "INFO")
-                return True, [single_video], None
+                return Result.ok([single_video])
         except Exception as exc:
-            error_msg = f"Error extrayendo informacion: {exc}"
-            logger.log(error_msg, "ERROR")
-            return False, [], error_msg
+            mapped_err = map_ytdlp_error(exc, "Error extrayendo informacion")
+            logger.log(str(mapped_err), "ERROR")
+            return Result.fail(mapped_err)
 
 
 class Config:
@@ -292,6 +371,7 @@ class Config:
         "format": "mp4",
         "mix_max_videos": 100,
         "language": "es",
+        "cookies_browser": "none",
     }
 
     MERGE_FORMATS = ("mp4", "mkv", "webm", "mov")
@@ -323,4 +403,4 @@ class Config:
             return True
         except OSError as exc:
             logger.log(f"Error guardando configuracion: {exc}", "ERROR")
-            return False
+            raise ConfigError(f"Error guardando configuracion: {exc}") from exc

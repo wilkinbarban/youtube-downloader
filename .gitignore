@@ -41,3 +41,7 @@ docs/screenshots/*.png
 docs/screenshots/*.jpg
 docs/screenshots/*.jpeg
 docs/screenshots/*.webp
+
+# Cookies
+cookies.txt
+cookies.json

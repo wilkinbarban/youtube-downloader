@@ -1,35 +1,42 @@
-﻿# ==========================================
+# ==========================================
 # YouTube Downloader Dependencies (Windows)
 # ==========================================
 # Project Python policy:
-#   - Supported: Python >=3.8 and <3.14
+#   - Supported: Python >=3.8 and <3.15
 #   - Recommended: Python 3.11
-# Note: PyQt6/Qt6 on Python 3.14 may trigger DLL loading errors on Windows.
+# Note: PyQt6/Qt6 on Python 3.15 may trigger DLL loading errors on Windows.
 
 # Graphical interface and visual components
-PyQt6>=6.11.0,<6.12 ; python_version >= "3.8" and python_version < "3.14"
+PyQt6>=6.11.0,<6.12 ; python_version >= "3.8" and python_version < "3.15"
 
 # Main download and metadata extraction engine
-yt-dlp>=2024.0.0 ; python_version >= "3.8" and python_version < "3.14"
+yt-dlp>=2024.0.0 ; python_version >= "3.8" and python_version < "3.15"
 
 # Clipboard handling (automatic monitor)
-pyperclip~=1.8.1 ; python_version >= "3.8" and python_version < "3.14"
+pyperclip~=1.8.1 ; python_version >= "3.8" and python_version < "3.15"
 
 # Process and system resource management
-psutil~=5.9.0 ; python_version >= "3.8" and python_version < "3.14"
+psutil~=5.9.0 ; python_version >= "3.8" and python_version < "3.15"
 
 # HTTP client for update checks
-requests>=2.28.0 ; python_version >= "3.8" and python_version < "3.14"
+requests>=2.28.0 ; python_version >= "3.8" and python_version < "3.15"
 
 # Semantic version parsing and comparison
-packaging>=23.0 ; python_version >= "3.8" and python_version < "3.14"
+packaging>=23.0 ; python_version >= "3.8" and python_version < "3.15"
 
 # File and path helpers
-pathlib2~=2.3.7 ; python_version >= "3.8" and python_version < "3.14"
+pathlib2~=2.3.7 ; python_version >= "3.8" and python_version < "3.15"
 
 # QR code generation (support dialog)
-qrcode[pil]>=7.4 ; python_version >= "3.8" and python_version < "3.14"
-Pillow>=9.0.0 ; python_version >= "3.8" and python_version < "3.14"
+qrcode[pil]>=7.4 ; python_version >= "3.8" and python_version < "3.15"
+Pillow>=9.0.0 ; python_version >= "3.8" and python_version < "3.15"
 
 # ==================================
-ffmpeg-python>=0.2.0 ; python_version >= "3.8" and python_version < "3.14"
+ffmpeg-python>=0.2.0 ; python_version >= "3.8" and python_version < "3.15"
+
+# Web Backend / Hybrid API
+fastapi>=0.100.0 ; python_version >= "3.8" and python_version < "3.15"
+uvicorn>=0.22.0 ; python_version >= "3.8" and python_version < "3.15"
+websockets>=11.0.3 ; python_version >= "3.8" and python_version < "3.15"
+pydantic>=2.0.0 ; python_version >= "3.8" and python_version < "3.15"
+python-multipart>=0.0.7 ; python_version >= "3.8" and python_version < "3.15"

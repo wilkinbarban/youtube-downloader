@@ -1,0 +1,178 @@
+/* Premium Nebula-Cyberpunk Stylesheet for YouTube Downloader Web Client */
+
+:root {
+    --glass-bg: rgba(11, 15, 30, 0.55);
+    --glass-border: rgba(255, 255, 255, 0.07);
+    --glass-blur: 24px;
+    --neon-purple: #a855f7;
+    --neon-fuchsia: #f43f5e;
+    --neon-indigo: #6366f1;
+    --neon-cyan: #06b6d4;
+    --neon-amber: #f59e0b;
+}
+
+body {
+    font-family: 'Space Grotesk', 'Inter', sans-serif;
+    background-color: #070913;
+    overflow-x: hidden;
+    position: relative;
+    min-height: 100vh;
+}
+
+/* Atmospheric animated background glows */
+body::before {
+    content: '';
+    position: fixed;
+    top: -10%;
+    left: -10%;
+    width: 60%;
+    height: 60%;
+    background: radial-gradient(circle, rgba(168, 85, 247, 0.12) 0%, transparent 70%);
+    z-index: -1;
+    filter: blur(120px);
+    animation: drift 25s ease-in-out infinite alternate;
+    pointer-events: none;
+}
+
+body::after {
+    content: '';
+    position: fixed;
+    bottom: -10%;
+    right: -10%;
+    width: 60%;
+    height: 60%;
+    background: radial-gradient(circle, rgba(6, 182, 212, 0.1) 0%, transparent 70%);
+    z-index: -1;
+    filter: blur(120px);
+    animation: drift 30s ease-in-out infinite alternate-reverse;
+    pointer-events: none;
+}
+
+@keyframes drift {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(10%, 8%) scale(1.15); }
+}
+
+/* Glassmorphism card utility */
+.glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    border-radius: 1.5rem;
+    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.02) inset;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+    border-color: rgba(168, 85, 247, 0.25);
+    box-shadow: 0 25px 45px -12px rgba(168, 85, 247, 0.09), 0 0 0 1px rgba(168, 85, 247, 0.04) inset;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.15);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(168, 85, 247, 0.18);
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(168, 85, 247, 0.45);
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+
+/* System Logs Terminal styling */
+#terminal-logs {
+    background-color: rgba(5, 5, 10, 0.8) !important;
+    border: 1px solid rgba(168, 85, 247, 0.12);
+    box-shadow: inset 0 4px 12px rgba(0, 0, 0, 0.5);
+    font-family: 'JetBrains Mono', 'Consolas', monospace;
+    font-size: 11px;
+}
+
+#terminal-logs::-webkit-scrollbar-thumb {
+    background: rgba(6, 182, 212, 0.2);
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+
+#terminal-logs::-webkit-scrollbar-thumb:hover {
+    background: rgba(6, 182, 212, 0.45);
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+
+/* Glowing Neon Animations for Progress Bar */
+.progress-fill {
+    background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple), var(--neon-fuchsia), var(--neon-cyan));
+    background-size: 200% 100%;
+    animation: gradient-shift 4s linear infinite;
+    box-shadow: 0 0 12px rgba(168, 85, 247, 0.35);
+    transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes gradient-shift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Toast Cards */
+.toast-card {
+    background: rgba(10, 12, 22, 0.88);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(168, 85, 247, 0.25);
+    border-radius: 1.25rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.65), 0 0 15px rgba(168, 85, 247, 0.15);
+}
+
+/* Input elements focus */
+input, select {
+    background-color: rgba(15, 23, 42, 0.5) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+input:focus, select:focus {
+    border-color: var(--neon-purple) !important;
+    background-color: rgba(15, 23, 42, 0.7) !important;
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.18), inset 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+    transform: translateY(-1px);
+}
+
+/* Download Cards status styles */
+.download-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.download-card:hover {
+    box-shadow: 0 15px 35px -8px rgba(0, 0, 0, 0.5), 0 0 12px rgba(168, 85, 247, 0.08);
+}
+
+/* Slide in animation for new queue items */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-slide-in {
+    animation: slideIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}

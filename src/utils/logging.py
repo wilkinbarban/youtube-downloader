@@ -56,3 +56,28 @@ class Logger:
 
 
 logger = Logger()
+
+
+class YtdlpLogger:
+    """Redirects yt-dlp messages to our application logger."""
+
+    def debug(self, msg):
+        if not msg.strip():
+            return
+        # Avoid logging spammy progress reports or fragment notices
+        if "[download]" in msg and "%" in msg:
+            return
+        if "[frag" in msg or "frag " in msg:
+            return
+        logger.log(f"[yt-dlp] {msg.strip()}", "DEBUG")
+
+    def warning(self, msg):
+        if not msg.strip():
+            return
+        logger.log(f"[yt-dlp WARNING] {msg.strip()}", "WARNING")
+
+    def error(self, msg):
+        if not msg.strip():
+            return
+        logger.log(f"[yt-dlp ERROR] {msg.strip()}", "ERROR")
+
