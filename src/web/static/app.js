@@ -175,8 +175,13 @@ function updateUI(state) {
                     <span id="${workerId}-status" class="text-slate-400">${statusText}</span>
                 </p>
             </div>
-            <div class="text-right">
+            <div class="flex items-center gap-3">
                 <span id="${workerId}-percent" class="text-sm font-bold font-outfit text-violet-400">${percent}%</span>
+                <button onclick="cancelActiveWorker('${workerId}')" 
+                        class="text-slate-400 hover:text-rose-400 transition-all p-1 hover:scale-110 active:scale-95" 
+                        title="Cancelar descarga">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
             </div>
         </div>
 
@@ -220,12 +225,57 @@ function createPendingCard(task, index) {
                     <span>Pendiente para descargar</span>
                 </p>
             </div>
-            <div>
+            <div class="flex items-center gap-2">
+                <button onclick="removePendingTask('${task.url}')" 
+                        class="text-slate-500 hover:text-rose-400 transition-all p-1 hover:scale-110 active:scale-95" 
+                        title="Eliminar de la cola">
+                    <i class="fa-solid fa-trash-can text-sm"></i>
+                </button>
                 <i class="fa-solid fa-clock text-slate-600 text-lg animate-pulse"></i>
             </div>
         </div>
     `;
     return card;
+}
+
+async function cancelActiveWorker(workerId) {
+    if (!confirm('¿Cancelar esta descarga?')) return;
+    try {
+        const response = await fetch(`/api/downloads/${encodeURIComponent(workerId)}/cancel`, { method: 'POST' });
+        const res = await response.json();
+        if (res.success) {
+            showToast('Descarga cancelada.', 'success');
+        } else {
+            showToast('No se pudo cancelar la descarga.', 'error');
+        }
+    } catch (err) {
+        console.error('Error cancelling worker:', err);
+        showToast('Error al intentar cancelar la descarga.', 'error');
+    } finally {
+        pollState();
+    }
+}
+
+async function removePendingTask(url) {
+    if (!confirm('¿Eliminar esta tarea de la cola?')) return;
+    try {
+        const response = await fetch('/api/downloads/remove-pending', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url: url })
+        });
+        const res = await response.json();
+        if (res.success) {
+            showToast('Tarea eliminada de la cola.', 'success');
+        } else {
+            showToast('No se pudo eliminar la tarea.', 'error');
+        }
+    } catch (err) {
+        console.error('Error removing pending task:', err);
+        showToast('Error al intentar eliminar la tarea.', 'error');
+    } finally {
+        pollState();
+    }
 }
 
 // WebSocket connection lifecycle
@@ -453,21 +503,193 @@ async function clearQueue() {
     }
 }
 
+// ==========================================
+// Web Integrated Folder Browser Logic
+// ==========================================
+
+let browserSelectedPath = '';
+
 async function browseFolderWeb() {
+    openFolderBrowser();
+}
+
+function openFolderBrowser() {
+    const modal = document.getElementById('folder-browser-modal');
+    modal.classList.add('modal-active');
+    
+    // Get the current path from settings input
+    let currentPath = document.getElementById('setting-folder').value.trim();
+    loadFileSystemPath(currentPath);
+}
+
+function closeFolderBrowser() {
+    const modal = document.getElementById('folder-browser-modal');
+    modal.classList.remove('modal-active');
+}
+
+async function loadFileSystemPath(path) {
+    const folderList = document.getElementById('browser-folder-list');
+    const pathInput = document.getElementById('browser-current-path');
+    const driveContainer = document.getElementById('browser-drive-container');
+    const driveSelect = document.getElementById('browser-drive-select');
+    
+    folderList.innerHTML = '<div class="col-span-2 text-center text-slate-500 text-xs py-12"><i class="fa-solid fa-spinner fa-spin mr-1 text-violet-400"></i> Cargando directorios...</div>';
+    
     try {
-        const response = await fetch('/api/config/browse', { method: 'POST' });
-        const res = await response.json();
-        if (res.success && res.path) {
-            document.getElementById('setting-folder').value = res.path;
-            showToast('Carpeta seleccionada: ' + res.path, 'success');
-        } else if (res.cancelled) {
-            // User cancelled the dialog, do nothing
+        let url = '/api/filesystem/browse';
+        if (path) {
+            url += `?path=${encodeURIComponent(path)}`;
+        }
+        
+        const response = await fetch(url);
+        if (!response.ok) {
+            const errData = await response.json();
+            throw new Error(errData.detail || 'Error al leer directorios');
+        }
+        
+        const data = await response.json();
+        
+        browserSelectedPath = data.current_path;
+        pathInput.value = data.current_path;
+        
+        // Render drives if available (Windows)
+        if (data.drives && data.drives.length > 0) {
+            driveContainer.classList.remove('hidden');
+            driveSelect.innerHTML = '';
+            data.drives.forEach(drive => {
+                const opt = document.createElement('option');
+                opt.value = drive;
+                opt.textContent = drive;
+                if (data.current_path.toUpperCase().startsWith(drive.toUpperCase())) {
+                    opt.selected = true;
+                }
+                driveSelect.appendChild(opt);
+            });
         } else {
-            showToast('No se pudo abrir el explorador de archivos.', 'error');
+            driveContainer.classList.add('hidden');
+        }
+        
+        // Render folder contents
+        folderList.innerHTML = '';
+        if (data.directories.length === 0) {
+            folderList.innerHTML = '<div class="col-span-2 text-center text-slate-500 text-xs py-12">Esta carpeta está vacía o no tiene subdirectorios.</div>';
+        } else {
+            data.directories.forEach(dir => {
+                const item = document.createElement('div');
+                item.className = 'folder-item-card p-3 flex items-center gap-3';
+                item.setAttribute('data-path', dir.path);
+                
+                // Double click to enter folder
+                item.addEventListener('dblclick', () => {
+                    loadFileSystemPath(dir.path);
+                });
+                
+                // Single click to highlight/select path
+                item.addEventListener('click', () => {
+                    // Remove highlight from others
+                    folderList.querySelectorAll('.folder-item-card').forEach(el => {
+                        el.classList.remove('border-violet-500/50', 'bg-violet-600/5');
+                    });
+                    item.classList.add('border-violet-500/50', 'bg-violet-600/5');
+                    browserSelectedPath = dir.path;
+                    pathInput.value = dir.path;
+                });
+                
+                item.innerHTML = `
+                    <div class="w-8 h-8 rounded-lg bg-violet-600/10 border border-violet-500/10 flex items-center justify-center text-violet-400">
+                        <i class="fa-solid fa-folder text-sm"></i>
+                    </div>
+                    <span class="text-xs font-semibold text-slate-200 truncate flex-1">${dir.name}</span>
+                `;
+                folderList.appendChild(item);
+            });
         }
     } catch (err) {
-        console.error('Error browsing folder:', err);
-        showToast('Error al abrir explorador de archivos', 'error');
+        console.error('Error browsing filesystem:', err);
+        folderList.innerHTML = `<div class="col-span-2 text-center text-rose-400 text-xs py-12"><i class="fa-solid fa-triangle-exclamation mr-1"></i> ${err.message || 'Error al cargar carpeta'}</div>`;
+    }
+}
+
+// Enter folder directly when pressing enter in the path bar
+setTimeout(() => {
+    const pathInput = document.getElementById('browser-current-path');
+    if (pathInput) {
+        pathInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                loadFileSystemPath(e.target.value.trim());
+            }
+        });
+    }
+}, 500);
+
+function handleDriveChange() {
+    const driveSelect = document.getElementById('browser-drive-select');
+    loadFileSystemPath(driveSelect.value);
+}
+
+async function navigateFolderUp() {
+    const pathInput = document.getElementById('browser-current-path');
+    try {
+        const response = await fetch(`/api/filesystem/browse?path=${encodeURIComponent(pathInput.value)}`);
+        if (response.ok) {
+            const data = await response.json();
+            if (data.parent_path) {
+                loadFileSystemPath(data.parent_path);
+            } else {
+                showToast('Ya estás en la raíz del disco.', 'info');
+            }
+        }
+    } catch (err) {
+        console.error('Error navigating up:', err);
+    }
+}
+
+function confirmFolderSelection() {
+    if (browserSelectedPath) {
+        document.getElementById('setting-folder').value = browserSelectedPath;
+        showToast('Carpeta seleccionada: ' + browserSelectedPath, 'success');
+        closeFolderBrowser();
+    }
+}
+
+// New folder modals
+function openNewFolderPrompt() {
+    document.getElementById('new-folder-modal').classList.add('modal-active');
+    document.getElementById('new-folder-name').value = '';
+    document.getElementById('new-folder-name').focus();
+}
+
+function closeNewFolderPrompt() {
+    document.getElementById('new-folder-modal').classList.remove('modal-active');
+}
+
+async function submitNewFolder() {
+    const nameInput = document.getElementById('new-folder-name');
+    const folderName = nameInput.value.trim();
+    if (!folderName) {
+        showToast('El nombre de la carpeta no puede estar vacío.', 'error');
+        return;
+    }
+    
+    const parentPath = document.getElementById('browser-current-path').value.trim();
+    try {
+        const response = await fetch('/api/filesystem/create-folder', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ parent_path: parentPath, folder_name: folderName })
+        });
+        
+        const res = await response.json();
+        if (response.ok && res.success) {
+            showToast('Carpeta creada con éxito.', 'success');
+            closeNewFolderPrompt();
+            loadFileSystemPath(parentPath); // refresh folder list
+        } else {
+            showToast(res.detail || 'Error al crear carpeta.', 'error');
+        }
+    } catch (err) {
+        console.error('Error creating folder:', err);
+        showToast('Error al crear carpeta.', 'error');
     }
 }
 

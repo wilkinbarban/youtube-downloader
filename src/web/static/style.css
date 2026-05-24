@@ -176,3 +176,41 @@ input:focus, select:focus {
 .animate-slide-in {
     animation: slideIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
+
+/* Folder Browser Explorer Styles */
+.folder-item-card {
+    background: rgba(15, 23, 42, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 0.75rem;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    user-select: none;
+}
+
+.folder-item-card:hover {
+    background: rgba(168, 85, 247, 0.08);
+    border-color: rgba(168, 85, 247, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px -6px rgba(168, 85, 247, 0.15);
+}
+
+.folder-item-card:active {
+    transform: translateY(0);
+    background: rgba(168, 85, 247, 0.15);
+}
+
+/* Modal helper utilities for transitions */
+.modal-active {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+.modal-active > div {
+    transform: scale(1) !important;
+}
+
+/* Modal default scaling transition */
+#folder-browser-modal > div, #new-folder-modal > div {
+    transform: scale(0.95);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}

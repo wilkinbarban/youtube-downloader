@@ -325,6 +325,97 @@ async def websocket_endpoint(websocket: WebSocket):
     except Exception:
         ws_manager.disconnect(websocket)
 
+import string
+import sys
+
+def get_windows_drives():
+    drives = []
+    for letter in string.ascii_uppercase:
+        drive_path = f"{letter}:\\"
+        if os.path.exists(drive_path):
+            drives.append(drive_path)
+    return drives
+
+@app.get("/api/filesystem/browse")
+async def browse_filesystem(path: str = None):
+    from src.config.paths import BASE_DIR
+    if not path:
+        config = Config.load()
+        path = config.get("download_folder") or BASE_DIR
+
+    path = os.path.abspath(path)
+    if not os.path.exists(path) or not os.path.isdir(path):
+        path = BASE_DIR
+
+    try:
+        items = os.listdir(path)
+    except Exception as exc:
+        raise HTTPException(status_code=400, detail=f"No se pudo acceder al directorio: {exc}")
+
+    directories = []
+    for item in items:
+        full_path = os.path.join(path, item)
+        try:
+            if os.path.isdir(full_path):
+                directories.append({
+                    "name": item,
+                    "path": full_path
+                })
+        except Exception:
+            continue
+
+    directories.sort(key=lambda d: d["name"].lower())
+
+    drives = []
+    if sys.platform == "win32":
+        drives = get_windows_drives()
+
+    return {
+        "current_path": path,
+        "parent_path": os.path.dirname(path) if os.path.dirname(path) != path else None,
+        "directories": directories,
+        "drives": drives
+    }
+
+class CreateFolderRequest(BaseModel):
+    parent_path: str
+    folder_name: str
+
+@app.post("/api/filesystem/create-folder")
+async def create_folder(payload: CreateFolderRequest):
+    if not payload.parent_path or not payload.folder_name:
+        raise HTTPException(status_code=400, detail="Ruta principal y nombre de carpeta requeridos")
+
+    clean_name = os.path.basename(payload.folder_name)
+    new_dir_path = os.path.join(payload.parent_path, clean_name)
+
+    try:
+        os.makedirs(new_dir_path, exist_ok=True)
+        return {"success": True, "path": new_dir_path}
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Error al crear carpeta: {exc}")
+
+@app.post("/api/downloads/{worker_id}/cancel")
+async def cancel_specific_download(worker_id: str):
+    manager = DownloadManager()
+    with manager.state_lock:
+        exists = worker_id in manager.active_downloads
+    if exists:
+        manager.cancel_worker(worker_id)
+        return {"success": True}
+    raise HTTPException(status_code=404, detail="Descarga activa no encontrada")
+
+class RemovePendingRequest(BaseModel):
+    url: str
+
+@app.post("/api/downloads/remove-pending")
+async def remove_specific_pending(payload: RemovePendingRequest):
+    if not payload.url:
+        raise HTTPException(status_code=400, detail="URL es requerida")
+    manager = DownloadManager()
+    manager.remove_pending_tasks_by_url([payload.url])
+    return {"success": True}
+
 # Mount static files folder last so it doesn't mask API routes
 if os.path.exists(WEB_STATIC_DIR):
     app.mount("/", StaticFiles(directory=WEB_STATIC_DIR, html=True), name="static")

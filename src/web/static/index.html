@@ -291,6 +291,107 @@
             </div>
         </div>
     </div>
+    <!-- Filesystem Folder Browser Modal -->
+    <div id="folder-browser-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md opacity-0 pointer-events-none transition-all duration-300">
+        <div class="glass-card w-full max-w-2xl mx-4 flex flex-col h-[550px] border border-white/10 overflow-hidden bg-[#0c0f1d]/90 shadow-2xl">
+            <!-- Modal Header -->
+            <div class="p-5 border-b border-white/5 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-violet-600/20 border border-violet-500/30 flex items-center justify-center text-violet-400">
+                        <i class="fa-solid fa-folder-tree"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-md font-bold text-white font-outfit">Explorador de Carpetas Servidor</h3>
+                        <p class="text-[10px] text-slate-400">Navega y selecciona la carpeta de descargas en el servidor</p>
+                    </div>
+                </div>
+                <button onclick="closeFolderBrowser();" class="text-slate-400 hover:text-white transition-all">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Path Bar & Actions -->
+            <div class="p-4 bg-slate-900/40 border-b border-white/5 flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+                <!-- Direct Path Edit Input -->
+                <div class="flex-1 relative flex items-center">
+                    <span class="absolute left-3 text-slate-500 text-xs">
+                        <i class="fa-solid fa-folder"></i>
+                    </span>
+                    <input type="text" id="browser-current-path" 
+                           class="w-full pl-8 pr-4 py-2 bg-slate-950/80 border border-white/10 rounded-lg text-xs focus:outline-none focus:border-violet-500 text-slate-200 font-mono font-medium">
+                </div>
+                <!-- Controls -->
+                <div class="flex items-center gap-2">
+                    <!-- Windows Drive Selector -->
+                    <div id="browser-drive-container" class="relative hidden">
+                        <select id="browser-drive-select" onchange="handleDriveChange();"
+                                class="pl-3 pr-8 py-2 bg-slate-950/80 border border-white/10 rounded-lg text-xs focus:outline-none focus:border-violet-500 text-slate-200 font-semibold cursor-pointer appearance-none">
+                            <!-- drives populated by JS -->
+                        </select>
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400 text-[10px]">
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </span>
+                    </div>
+                    <!-- Go Up -->
+                    <button onclick="navigateFolderUp();" id="btn-browser-up"
+                            class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-white/10 hover:border-violet-500/50 text-xs font-semibold text-slate-200 transition-all flex items-center gap-1 active:scale-95">
+                        <i class="fa-solid fa-arrow-up text-violet-400"></i> Subir
+                    </button>
+                    <!-- New Folder -->
+                    <button onclick="openNewFolderPrompt();"
+                            class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-white/10 hover:border-violet-500/50 text-xs font-semibold text-slate-200 transition-all flex items-center gap-1 active:scale-95 whitespace-nowrap">
+                        <i class="fa-solid fa-folder-plus text-emerald-400"></i> Nueva...
+                    </button>
+                </div>
+            </div>
+
+            <!-- Folder Contents Panel -->
+            <div id="browser-folder-list" class="flex-1 p-5 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 gap-3 bg-[#070913]/30 min-h-0">
+                <!-- folders populated by JS -->
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-5 border-t border-white/5 flex items-center justify-between bg-slate-900/20">
+                <button onclick="closeFolderBrowser();" 
+                        class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/5 hover:border-white/10 text-xs font-semibold text-slate-300 transition-all active:scale-95">
+                    Cancelar
+                </button>
+                <button onclick="confirmFolderSelection();" 
+                        class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-xs font-semibold text-white tracking-wide shadow-lg shadow-violet-600/20 active:scale-95 transition-all flex items-center gap-1.5">
+                    <i class="fa-solid fa-circle-check"></i> Seleccionar Carpeta
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Folder Dialog Modal -->
+    <div id="new-folder-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm opacity-0 pointer-events-none transition-all duration-300">
+        <div class="glass-card w-full max-w-sm mx-4 p-6 border border-white/10 bg-[#0c0f1d]/95 shadow-2xl space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-emerald-600/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                    <i class="fa-solid fa-folder-plus"></i>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-white font-outfit">Nueva Carpeta</h3>
+                    <p class="text-[10px] text-slate-400">Ingresa el nombre del nuevo directorio</p>
+                </div>
+            </div>
+            <div>
+                <input type="text" id="new-folder-name" required placeholder="Nombre de la carpeta..."
+                       class="w-full px-3 py-2.5 bg-slate-950/80 border border-white/10 rounded-lg text-xs focus:outline-none focus:border-emerald-500 text-slate-200 font-medium">
+            </div>
+            <div class="flex items-center justify-end gap-3 pt-2">
+                <button onclick="closeNewFolderPrompt();" 
+                        class="px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 transition-all">
+                    Cancelar
+                </button>
+                <button onclick="submitNewFolder();" 
+                        class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white transition-all">
+                    Crear
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Web App JS Logic -->
     <script src="app.js"></script>
