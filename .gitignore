@@ -44,3 +44,16 @@ docs/screenshots/*.webp
 # Cookies
 cookies.txt
 cookies.json
+
+# PyInstaller spec files
+*.spec
+
+# Temporary / scratch files
+scratch/
+err.txt
+out.txt
+refactor.py
+
+# AI tool data
+.antigravitycli/
+

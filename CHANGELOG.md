@@ -5,7 +5,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-### [1.3.0] - 2026-05-23
+## [Unreleased]
+
+### [1.3.0] - 2026-05-24
 
 ### Added
 - **Python 3.14 Support**: Expanded runtime policy and compatibility ceiling to `<3.15` to officially support Python 3.14.x runtimes (tested with Python 3.14.5).
@@ -38,11 +40,26 @@ To combat YouTube's strict bot-detection rules (*"Sign in to confirm you’re no
 4. **Interactive Interfaces**:
    - **PyQt6 (ConfigDialog)**: Added a cookie status indicator (`Active cookies.txt`, `Pending conversion cookies.json`, or `No cookies`) and an "Importar cookies..." button that lets users select either `.json` or `.txt` files, copies them to the root directory, performs the conversion on-the-fly, and displays instant feedback.
    - **Web Manager Client**: Exposed endpoints `GET /api/config/cookies/status` and `POST /api/config/cookies` allowing users to upload cookies files from their web browsers, which are parsed and processed by the backend.
+- **Minimize to System Tray**: Added `QSystemTrayIcon` support with a context menu (Restore Window, Open Web Manager, Pause/Resume Downloads, Quit). Clipboard monitor is automatically paused when minimized and restored when the window is brought back.
+- **Live Language Switching in Web Manager**: Implemented client-side localization engine in `app.js` with dynamic fetches to `/api/i18n/{lang}`. The language selector instantly translates all headings, labels, placeholders, toast alerts, neon confirmation modals, folder browser, and download status cards without page reload.
+- **Web Integrated Folder Browser**: Added server-side filesystem browsing endpoints (`GET /api/filesystem/browse`, `POST /api/filesystem/create-folder`) and a full glassmorphic modal folder navigator with breadcrumbs, drive selector, and new-folder creation — eliminating dependency on native OS file dialogs.
+- **Individual Download Actions**: Added per-task cancel and remove-from-queue buttons in the web interface with integrated neon confirmation modals.
+- **Custom Confirmation Modals**: Replaced native browser `confirm()` dialogs with themed glassmorphic modals featuring Promise-based async flow.
+- **Drag-and-Drop Cookie Upload**: Created an interactive drop zone (`#cookie-drop-zone`) in the web settings for uploading `cookies.txt`/`cookies.json` files with drag-over animations and instant backend processing.
+
+### Fixed
+- **Silent .exe Crash on Startup**: Extended `DummyStream` in the PyInstaller windowed build to include `isatty()`, `encoding`, and `errors` attributes required by uvicorn/click, preventing silent `AttributeError` crashes when `sys.stdout` is `None`.
+- **Web Manager 404 Error**: Added `--add-data "src/web/static;src/web/static"` to the release build workflow so the web interface files are bundled into the production `.exe`.
+- **Download Progress Not Showing in Web UI**: Replaced URL-based `worker_id` generation (containing special characters that broke DOM selectors) with UUID v4 identifiers (`worker_{uuid4.hex}`).
+- **HTTP Request Storm on Progress**: Removed cascading `pollState()` calls from `updateTaskProgress` when DOM elements are not yet inserted, preventing hundreds of concurrent HTTP requests that froze the web server.
+- **Batch Enqueue Performance**: Implemented `enqueue_tasks()` for bulk enqueueing with a single state lock acquisition and one WebSocket notification, plus `throttleUpdateUI` (150ms cap) to prevent DOM rendering storms when processing large playlists.
+- **Queue Loop Latency**: Redesigned `_process_queue_loop` to start concurrent downloads immediately when slots are available (0.01s yield) instead of waiting 1 second per iteration.
 
 ### Changed
 - Updated User Guide in Spanish, English, and Portuguese to include detailed troubleshooting steps for YouTube bot blocks and browser cookie database locks.
 - **Nebula-Cyberpunk UI Design**: Unified and modernized the visual design of both the Web Manager and the PyQt6 Desktop application using glassmorphism, glowing accents, neon dynamic backgrounds/borders, customized scrollbars, and styled linear progress bars.
 - **Unified PyQt6 Dialogs**: Redesigned dialogs (`ConfigDialog`, `DependenciesDialog`, `HelpDialog`, and `SupportDialog`) in `dialogs.py` to group settings inside distinct card layouts with structured alignments, themed action buttons (primary gradient / red cancel style), and a portable base64 SVG checkmark for checkboxes.
+- **Web Settings Panel Redesign**: Reorganized the Configuración module into two logical groups (Downloads & Quality / Authentication & Cookies) with section headers, inline input icons, divider lines, and a premium gradient save button.
 
 ## [1.2.2] - 2026-04-22
 

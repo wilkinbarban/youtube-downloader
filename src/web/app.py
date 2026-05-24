@@ -157,6 +157,7 @@ def background_extract_and_enqueue(url: str, quality: str):
             logger.log(f"Límite de lote web aplicado: reduciendo de {len(videos)} a {limit}", "WARNING")
             videos = videos[:limit]
             
+    tasks = []
     for item in videos:
         task = VideoDownloadTask(
             url=item["url"],
@@ -164,7 +165,8 @@ def background_extract_and_enqueue(url: str, quality: str):
             quality=quality,
             playlist_id=playlist_id
         )
-        manager.enqueue_task(task)
+        tasks.append(task)
+    manager.enqueue_tasks(tasks)
     logger.log(f"Cola web: Encolados {len(videos)} videos con calidad {quality}.", "INFO")
 
 @app.post("/api/downloads/add")
@@ -415,6 +417,11 @@ async def remove_specific_pending(payload: RemovePendingRequest):
     manager = DownloadManager()
     manager.remove_pending_tasks_by_url([payload.url])
     return {"success": True}
+
+@app.get("/api/i18n/{lang}")
+async def get_i18n_translations(lang: str):
+    from src.config.i18n import TRANSLATIONS
+    return TRANSLATIONS.get(lang, TRANSLATIONS.get("es", {}))
 
 # Mount static files folder last so it doesn't mask API routes
 if os.path.exists(WEB_STATIC_DIR):

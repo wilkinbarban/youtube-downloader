@@ -43,28 +43,28 @@
                     <h1 class="text-2xl font-bold font-outfit tracking-wide bg-gradient-to-r from-white via-slate-100 to-slate-400 bg-clip-text text-transparent">
                         YouTube Downloader
                     </h1>
-                    <p class="text-xs text-violet-400 font-medium tracking-wider uppercase mt-0.5">Asynchronous Web Manager</p>
+                    <p class="text-xs text-violet-400 font-medium tracking-wider uppercase mt-0.5" data-i18n="btn_web_manager">Asynchronous Web Manager</p>
                 </div>
             </div>
-
+ 
             <!-- Stats & Connection Indicator -->
             <div class="flex items-center flex-wrap gap-4">
                 <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900/40 border border-white/5 text-xs text-slate-300">
                     <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping absolute"></span>
                     <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 relative"></span>
-                    <span id="conn-status" class="font-medium text-slate-300">Conectado (WS)</span>
+                    <span id="conn-status" class="font-medium text-slate-300" data-i18n="web_status_conn_ws">Conectado (WS)</span>
                 </div>
                 <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900/40 border border-white/5 text-xs text-slate-300">
                     <i class="fa-solid fa-spinner fa-spin text-violet-400"></i>
-                    <span class="font-medium">Activos: <span id="stat-active">0</span></span>
+                    <span class="font-medium"><span data-i18n="web_active">Activos</span>: <span id="stat-active">0</span></span>
                 </div>
                 <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900/40 border border-white/5 text-xs text-slate-300">
                     <i class="fa-solid fa-pause text-yellow-400"></i>
-                    <span class="font-medium">En Cola: <span id="stat-pending">0</span></span>
+                    <span class="font-medium"><span data-i18n="web_queued">En Cola</span>: <span id="stat-pending">0</span></span>
                 </div>
             </div>
         </header>
-
+ 
         <!-- Main Workspace Layout -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
@@ -74,7 +74,7 @@
                 <!-- Add Task Panel -->
                 <section class="glass-card p-6 border-t-2 border-t-violet-500/50">
                     <h2 class="text-lg font-bold font-outfit text-white mb-4 flex items-center gap-2">
-                        <i class="fa-solid fa-link text-violet-400"></i> Añadir Descarga
+                        <i class="fa-solid fa-link text-violet-400"></i> <span data-i18n="web_add_task">Añadir Descarga</span>
                     </h2>
                     <form id="add-task-form" class="space-y-4" onsubmit="event.preventDefault(); handleAddTask();">
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -83,7 +83,7 @@
                                 <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
                                     <i class="fa-brands fa-youtube"></i>
                                 </span>
-                                <input type="url" id="task-url" required 
+                                <input type="url" id="task-url" required data-i18n="web_url_placeholder"
                                        placeholder="Pega la URL del video o lista de reproducción..." 
                                        class="w-full pl-10 pr-4 py-3 bg-slate-900/50 border border-white/10 rounded-xl text-sm focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500 transition-all placeholder:text-slate-500 text-white font-medium">
                             </div>
@@ -91,25 +91,25 @@
                             <div class="relative">
                                 <select id="task-quality" 
                                         class="w-full px-4 py-3 bg-slate-900/50 border border-white/10 rounded-xl text-sm focus:outline-none focus:border-violet-500 transition-all text-white font-medium appearance-none cursor-pointer">
-                                    <option value="best">Mejor Calidad</option>
-                                    <option value="4k">Ultra HD (4K)</option>
-                                    <option value="1080p">Full HD (1080p)</option>
-                                    <option value="720p" selected>HD (720p)</option>
-                                    <option value="480p">SD (480p)</option>
-                                    <option value="360p">Baja (360p)</option>
-                                    <option value="audio">Sólo Audio (MP3/M4A)</option>
+                                    <option value="best" data-i18n="quality_best">Mejor Calidad</option>
+                                    <option value="4k" data-i18n="quality_4k">Ultra HD (4K)</option>
+                                    <option value="1080p" data-i18n="quality_1080p">Full HD (1080p)</option>
+                                    <option value="720p" selected data-i18n="quality_720p">HD (720p)</option>
+                                    <option value="480p" data-i18n="quality_480p">SD (480p)</option>
+                                    <option value="360p" data-i18n="quality_360p">Baja (360p)</option>
+                                    <option value="audio" data-i18n="quality_audio">Sólo Audio (MP3/M4A)</option>
                                 </select>
                                 <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400 text-xs">
                                     <i class="fa-solid fa-chevron-down"></i>
                                 </span>
                             </div>
                         </div>
-
+ 
                         <!-- Action Button -->
                         <div class="flex justify-end pt-2">
                             <button type="submit" id="btn-submit"
                                     class="px-6 py-3 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-sm font-semibold tracking-wide shadow-lg shadow-violet-600/20 active:scale-95 transition-all text-white flex items-center gap-2">
-                                <i class="fa-solid fa-plus"></i> Iniciar Descarga
+                                <i class="fa-solid fa-plus"></i> <span data-i18n="web_start_download">Iniciar Descarga</span>
                             </button>
                         </div>
                     </form>
@@ -118,69 +118,69 @@
                 <!-- Queue Controls Band -->
                 <section class="flex flex-wrap gap-4 items-center justify-between p-4 glass-card bg-slate-900/30">
                     <div class="flex items-center gap-2">
-                        <span class="text-xs text-slate-400 uppercase font-bold tracking-wider">Controles Globales</span>
+                        <span class="text-xs text-slate-400 uppercase font-bold tracking-wider" data-i18n="web_global_controls">Controles Globales</span>
                     </div>
                     <div class="flex flex-wrap gap-3">
                         <!-- Pause/Resume Queue -->
                         <button onclick="togglePauseQueue();" id="btn-pause-queue"
                                 class="px-4 py-2 rounded-xl bg-slate-900/50 hover:bg-slate-800/80 border border-white/10 hover:border-violet-500/50 text-xs font-semibold text-slate-200 transition-all flex items-center gap-1.5 active:scale-95">
-                            <i class="fa-solid fa-pause text-yellow-400" id="pause-icon"></i> <span id="pause-text">Pausar Todo</span>
+                            <i class="fa-solid fa-pause text-yellow-400" id="pause-icon"></i> <span id="pause-text" data-i18n="btn_pause_all">Pausar Todo</span>
                         </button>
                         <!-- Cancel All -->
                         <button onclick="cancelAllDownloads();"
                                 class="px-4 py-2 rounded-xl bg-rose-950/20 hover:bg-rose-950/40 border border-rose-500/20 hover:border-rose-500/50 text-xs font-semibold text-rose-300 transition-all flex items-center gap-1.5 active:scale-95">
-                            <i class="fa-solid fa-ban text-rose-400"></i> Cancelar Todo
+                            <i class="fa-solid fa-ban text-rose-400"></i> <span data-i18n="btn_cancel_active">Cancelar Todo</span>
                         </button>
                         <!-- Clear History -->
                         <button onclick="clearHistory();"
                                 class="px-4 py-2 rounded-xl bg-slate-900/50 hover:bg-slate-800/80 border border-white/10 hover:border-slate-500/50 text-xs font-semibold text-slate-300 transition-all flex items-center gap-1.5 active:scale-95">
-                            <i class="fa-solid fa-trash-can text-slate-400"></i> Limpiar Historial
+                            <i class="fa-solid fa-trash-can text-slate-400"></i> <span data-i18n="btn_clear_history">Limpiar Historial</span>
                         </button>
                         <!-- Clear Queue -->
                         <button onclick="clearQueue();"
                                 class="px-4 py-2 rounded-xl bg-amber-950/20 hover:bg-amber-950/40 border border-amber-500/20 hover:border-amber-500/50 text-xs font-semibold text-amber-300 transition-all flex items-center gap-1.5 active:scale-95">
-                            <i class="fa-solid fa-broom text-amber-400"></i> Limpiar Lista
+                            <i class="fa-solid fa-broom text-amber-400"></i> <span data-i18n="btn_clear_queue">Limpiar Lista</span>
                         </button>
                     </div>
                 </section>
-
+ 
                 <!-- Active & Pending Queue -->
                 <section class="space-y-4">
                     <h2 class="text-lg font-bold font-outfit text-white flex items-center gap-2">
-                        <i class="fa-solid fa-circle-play text-violet-400"></i> Descargas Activas y Pendientes
+                        <i class="fa-solid fa-circle-play text-violet-400"></i> <span data-i18n="web_downloads_title">Descargas Activas y Pendientes</span>
                     </h2>
                     
                     <div id="downloads-container" class="space-y-4">
                         <!-- Placeholder/Empty State -->
                         <div id="empty-queue-state" class="glass-card p-12 text-center text-slate-400 border-dashed border border-white/10">
                             <i class="fa-solid fa-cloud-arrow-down text-4xl text-slate-600 mb-3 block"></i>
-                            <p class="font-medium text-sm">No hay descargas en curso ni tareas pendientes.</p>
-                            <p class="text-xs text-slate-500 mt-1">¡Pega una URL de YouTube arriba para comenzar!</p>
+                            <p class="font-medium text-sm" data-i18n="web_empty_queue">No hay descargas en curso ni tareas pendientes.</p>
+                            <p class="text-xs text-slate-500 mt-1" data-i18n="web_empty_queue_hint">¡Pega una URL de YouTube arriba para comenzar!</p>
                         </div>
                     </div>
                 </section>
-
+ 
                 <!-- History -->
                 <section class="space-y-4">
                     <h2 class="text-lg font-bold font-outfit text-white flex items-center gap-2">
-                        <i class="fa-solid fa-clock-rotate-left text-violet-400"></i> Historial de Completados
+                        <i class="fa-solid fa-clock-rotate-left text-violet-400"></i> <span data-i18n="web_history_title">Historial de Completados</span>
                     </h2>
-
+ 
                     <div class="glass-card overflow-hidden">
                         <div class="overflow-x-auto">
                             <table class="w-full text-left text-sm border-collapse">
                                 <thead>
                                     <tr class="bg-slate-900/60 text-slate-400 border-b border-white/5 font-medium text-xs tracking-wider uppercase">
-                                        <th class="p-4">Video / Título</th>
-                                        <th class="p-4">Calidad</th>
-                                        <th class="p-4">Fecha</th>
-                                        <th class="p-4">Estado</th>
+                                        <th class="p-4" data-i18n="history_title">Video / Título</th>
+                                        <th class="p-4" data-i18n="history_quality">Calidad</th>
+                                        <th class="p-4" data-i18n="history_date">Fecha</th>
+                                        <th class="p-4" data-i18n="history_status">Estado</th>
                                     </tr>
                                 </thead>
                                 <tbody id="history-rows" class="divide-y divide-white/5">
                                     <!-- Rows populated by app.js -->
                                     <tr id="empty-history-row">
-                                        <td colspan="4" class="p-8 text-center text-slate-500 text-xs">
+                                        <td colspan="4" class="p-8 text-center text-slate-500 text-xs" data-i18n="web_empty_history">
                                             El historial de descargas está vacío.
                                         </td>
                                     </tr>
@@ -190,58 +190,95 @@
                     </div>
                 </section>
             </div>
-
+ 
             <!-- Right Column: Settings & Terminal Logs -->
             <div class="space-y-8">
                 
                 <!-- Settings Panel -->
-                <section class="glass-card p-6">
-                    <h2 class="text-lg font-bold font-outfit text-white mb-4 flex items-center gap-2">
-                        <i class="fa-solid fa-sliders text-violet-400"></i> Configuración
+                <section class="glass-card p-6 border-t-2 border-t-violet-500/50">
+                    <h2 class="text-lg font-bold font-outfit text-white mb-6 flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-violet-400"></i> <span data-i18n="web_settings_title">Configuración</span>
                     </h2>
-                    <form id="settings-form" class="space-y-4" onsubmit="event.preventDefault(); saveSettings();">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Carpeta de Descarga</label>
-                            <div class="flex items-center gap-2">
-                                <input type="text" id="setting-folder" 
-                                       class="flex-1 px-3 py-2.5 bg-slate-900/50 border border-white/10 rounded-lg text-xs focus:outline-none focus:border-violet-500 transition-all text-white font-medium">
-                                <button type="button" onclick="browseFolderWeb();"
-                                        class="px-3 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-white/10 hover:border-violet-500/50 text-xs font-semibold text-slate-200 transition-all flex items-center gap-1.5 active:scale-95 whitespace-nowrap">
-                                    <i class="fa-solid fa-folder-open text-violet-400"></i> Buscar...
-                                </button>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Límite Lote Mix</label>
-                                <input type="number" id="setting-mix-limit" min="1" max="100" 
-                                       class="w-full px-3 py-2.5 bg-slate-900/50 border border-white/10 rounded-lg text-xs focus:outline-none focus:border-violet-500 transition-all text-white font-medium">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Idioma</label>
-                                <select id="setting-lang" 
-                                        class="w-full px-3 py-2.5 bg-slate-900/50 border border-white/10 rounded-lg text-xs focus:outline-none focus:border-violet-500 transition-all text-white font-medium cursor-pointer">
-                                    <option value="es">Español</option>
-                                    <option value="en">English</option>
-                                    <option value="pt">Português</option>
-                                </select>
-                            </div>
-                        </div>
-                        <!-- Cookies / Bot Bypass section styled beautifully -->
-                        <div class="p-4 rounded-2xl bg-violet-950/10 border border-violet-500/20 space-y-4">
-                            <div class="flex items-center gap-2">
-                                <div class="w-6 h-6 rounded-lg bg-violet-600/20 border border-violet-500/30 flex items-center justify-center text-violet-400">
-                                    <i class="fa-solid fa-cookie-bite text-xs"></i>
-                                </div>
-                                <h3 class="text-xs font-bold text-white uppercase tracking-wider">Bypass de Bot (Cookies)</h3>
+                    <form id="settings-form" class="space-y-5" onsubmit="event.preventDefault(); saveSettings();">
+                        
+                        <!-- Section 1: Downloads and Quality -->
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-wider pb-1">
+                                <i class="fa-solid fa-circle-nodes text-violet-400/80"></i>
+                                <span data-i18n="config_group_downloads">Descargas y Calidad</span>
                             </div>
                             
-                            <div>
-                                <label class="block text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Cookies de Navegador</label>
+                            <!-- Folder Selector -->
+                            <div class="space-y-2">
+                                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider" data-i18n="web_download_folder">Carpeta de Descarga</label>
+                                <div class="flex items-center gap-2">
+                                    <div class="relative flex-1">
+                                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 text-xs">
+                                            <i class="fa-solid fa-folder text-violet-400/70"></i>
+                                        </span>
+                                        <input type="text" id="setting-folder" readonly onclick="browseFolderWeb();"
+                                               class="w-full pl-9 pr-3 py-2.5 bg-slate-900/50 border border-white/10 rounded-xl text-xs focus:outline-none focus:border-violet-500 transition-all text-white font-mono font-medium cursor-pointer"
+                                               placeholder="Selecciona carpeta...">
+                                    </div>
+                                    <button type="button" onclick="browseFolderWeb();"
+                                            class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/10 hover:border-violet-500/50 text-xs font-semibold text-slate-200 transition-all flex items-center gap-1.5 active:scale-95 whitespace-nowrap">
+                                        <i class="fa-solid fa-folder-open text-violet-400"></i> <span data-i18n="web_browse">Buscar...</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Limit and Language (2 Columns grid) -->
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="space-y-2">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider" data-i18n="web_mix_limit">Límite Lote Mix</label>
+                                    <div class="relative">
+                                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 text-xs">
+                                            <i class="fa-solid fa-hashtag text-violet-400/70"></i>
+                                        </span>
+                                        <input type="number" id="setting-mix-limit" min="1" max="100" 
+                                               class="w-full pl-9 pr-3 py-2.5 bg-slate-900/50 border border-white/10 rounded-xl text-xs focus:outline-none focus:border-violet-500 transition-all text-white font-medium">
+                                    </div>
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider" data-i18n="web_language">Idioma</label>
+                                    <div class="relative">
+                                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 text-xs">
+                                            <i class="fa-solid fa-language text-violet-400/70"></i>
+                                        </span>
+                                        <select id="setting-lang" 
+                                                class="w-full pl-9 pr-8 py-2.5 bg-slate-900/50 border border-white/10 rounded-xl text-xs focus:outline-none focus:border-violet-500 transition-all text-white font-medium cursor-pointer appearance-none">
+                                            <option value="es">Español</option>
+                                            <option value="en">English</option>
+                                            <option value="pt">Português</option>
+                                        </select>
+                                        <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400 text-[10px]">
+                                            <i class="fa-solid fa-chevron-down"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Divider line -->
+                        <div class="border-t border-white/5 pt-2"></div>
+
+                        <!-- Section 2: Authentication and Cookies -->
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-wider pb-1">
+                                <i class="fa-solid fa-shield-halved text-fuchsia-400/80 animate-pulse"></i>
+                                <span data-i18n="config_group_auth">Autenticación y Cookies</span>
+                            </div>
+
+                            <!-- Browser Cookies Selector -->
+                            <div class="space-y-2">
+                                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider" data-i18n="web_browser_cookies">Cookies de Navegador</label>
                                 <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 text-xs">
+                                        <i class="fa-solid fa-cookie-bite text-fuchsia-400/80"></i>
+                                    </span>
                                     <select id="setting-cookies" 
-                                            class="w-full px-3 py-2 bg-slate-900/50 border border-white/10 rounded-lg text-xs focus:outline-none focus:border-violet-500 transition-all text-white font-medium cursor-pointer appearance-none">
-                                        <option value="none">Ninguno (None)</option>
+                                            class="w-full pl-9 pr-8 py-2.5 bg-slate-900/50 border border-white/10 rounded-xl text-xs focus:outline-none focus:border-violet-500 transition-all text-white font-medium cursor-pointer appearance-none">
+                                        <option value="none" data-i18n="config_cookies_none">Ninguno (None)</option>
                                         <option value="chrome">Chrome</option>
                                         <option value="firefox">Firefox</option>
                                         <option value="edge">Edge</option>
@@ -253,38 +290,47 @@
                                     </span>
                                 </div>
                             </div>
-                            
-                            <div>
-                                <label class="block text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Archivo de Cookies Local (cookies.txt / cookies.json)</label>
-                                <!-- Drag and Drop Cookie Upload Zone -->
-                                <div id="cookie-drop-zone" class="border border-dashed border-violet-500/30 rounded-xl p-4 bg-slate-900/20 hover:bg-slate-900/40 hover:border-violet-500/60 transition-all duration-300 flex flex-col items-center justify-center gap-2 cursor-pointer">
-                                    <i id="cookie-upload-icon" class="fa-solid fa-cloud-arrow-up text-xl text-violet-400"></i>
-                                    <span class="text-xs font-semibold text-slate-200 text-center">Importar cookies.txt / cookies.json</span>
-                                    <span class="text-[9px] text-slate-500 text-center">Arrastra el archivo aquí o haz clic para buscar</span>
-                                    <span id="cookie-file-status" class="text-[10px] text-slate-400 font-semibold mt-1">Cargando estado...</span>
+
+                            <!-- Local Cookies Drop Zone -->
+                            <div class="space-y-2">
+                                <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider" data-i18n="web_local_cookies_label">Archivo de Cookies Local (cookies.txt / cookies.json)</label>
+                                <div id="cookie-drop-zone" class="border border-dashed border-fuchsia-500/20 hover:border-fuchsia-500/50 rounded-2xl p-5 bg-slate-950/40 hover:bg-slate-950/80 transition-all duration-300 flex flex-col items-center justify-center gap-3 cursor-pointer">
+                                    <div class="w-10 h-10 rounded-full bg-fuchsia-500/10 flex items-center justify-center">
+                                        <i id="cookie-upload-icon" class="fa-solid fa-cloud-arrow-up text-md text-fuchsia-400 animate-bounce"></i>
+                                    </div>
+                                    <div class="text-center space-y-1">
+                                        <span class="text-xs font-semibold text-slate-200 block" id="cookie-upload-text" data-i18n="web_import_cookies">Importar cookies.txt / cookies.json</span>
+                                        <span class="text-[10px] text-slate-500 block" id="cookie-drag-text" data-i18n="web_drag_cookies_hint">Arrastra el archivo aquí o haz clic para buscar</span>
+                                    </div>
+                                    <span id="cookie-file-status" class="text-[10px] text-slate-400 font-semibold px-2 py-1 rounded bg-slate-900/60 border border-white/5 mt-1">Cargando estado...</span>
                                     <input type="file" id="cookie-file-input" class="hidden" accept=".json,.txt" onchange="uploadCookieFile()">
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Divider line -->
+                        <div class="border-t border-white/5 pt-2"></div>
+
+                        <!-- Submit and status -->
                         <div class="flex items-center justify-between pt-2">
-                            <span id="settings-save-status" class="text-xs text-emerald-400 opacity-0 transition-opacity duration-300">Guardado</span>
+                            <span id="settings-save-status" class="text-xs text-emerald-400 opacity-0 transition-opacity duration-300 font-medium" data-i18n="language_saved">Guardado</span>
                             <button type="submit" 
-                                    class="px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-xs font-semibold tracking-wide shadow-lg shadow-violet-600/10 active:scale-95 transition-all text-white flex items-center gap-1.5">
-                                <i class="fa-solid fa-floppy-disk"></i> Guardar Ajustes
+                                    class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-xs font-semibold tracking-wide shadow-lg shadow-violet-600/25 active:scale-95 transition-all text-white flex items-center gap-2">
+                                <i class="fa-solid fa-floppy-disk"></i> <span data-i18n="web_save_settings">Guardar Ajustes</span>
                             </button>
                         </div>
                     </form>
                 </section>
-
+ 
                 <!-- System Logs (Terminal) -->
                 <section class="glass-card p-6 flex flex-col h-[400px]">
                     <div class="flex items-center justify-between mb-4">
                         <h2 class="text-lg font-bold font-outfit text-white flex items-center gap-2">
-                            <i class="fa-solid fa-terminal text-violet-400"></i> Logs del Sistema
+                            <i class="fa-solid fa-terminal text-violet-400"></i> <span data-i18n="web_logs_title">Logs del Sistema</span>
                         </h2>
                         <button onclick="fetchLogs();" 
                                 class="text-slate-400 hover:text-white transition-all text-xs flex items-center gap-1">
-                            <i class="fa-solid fa-arrows-rotate"></i> Actualizar
+                            <i class="fa-solid fa-arrows-rotate"></i> <span data-i18n="web_refresh">Actualizar</span>
                         </button>
                     </div>
                     <div id="terminal-logs" 
@@ -318,8 +364,8 @@
                         <i class="fa-solid fa-folder-tree"></i>
                     </div>
                     <div>
-                        <h3 class="text-md font-bold text-white font-outfit">Explorador de Carpetas Servidor</h3>
-                        <p class="text-[10px] text-slate-400">Navega y selecciona la carpeta de descargas en el servidor</p>
+                        <h3 class="text-md font-bold text-white font-outfit" data-i18n="web_server_explorer">Explorador de Carpetas Servidor</h3>
+                        <p class="text-[10px] text-slate-400" data-i18n="web_server_explorer_subtitle">Navega y selecciona la carpeta de descargas en el servidor</p>
                     </div>
                 </div>
                 <button onclick="closeFolderBrowser();" class="text-slate-400 hover:text-white transition-all">
@@ -352,12 +398,12 @@
                     <!-- Go Up -->
                     <button onclick="navigateFolderUp();" id="btn-browser-up"
                             class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-white/10 hover:border-violet-500/50 text-xs font-semibold text-slate-200 transition-all flex items-center gap-1 active:scale-95">
-                        <i class="fa-solid fa-arrow-up text-violet-400"></i> Subir
+                        <i class="fa-solid fa-arrow-up text-violet-400"></i> <span data-i18n="web_up">Subir</span>
                     </button>
                     <!-- New Folder -->
                     <button onclick="openNewFolderPrompt();"
                             class="px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-white/10 hover:border-violet-500/50 text-xs font-semibold text-slate-200 transition-all flex items-center gap-1 active:scale-95 whitespace-nowrap">
-                        <i class="fa-solid fa-folder-plus text-emerald-400"></i> Nueva...
+                        <i class="fa-solid fa-folder-plus text-emerald-400"></i> <span data-i18n="web_new_folder">Nueva...</span>
                     </button>
                 </div>
             </div>
@@ -370,12 +416,13 @@
             <!-- Modal Footer -->
             <div class="p-5 border-t border-white/5 flex items-center justify-between bg-slate-900/20">
                 <button onclick="closeFolderBrowser();" 
-                        class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/5 hover:border-white/10 text-xs font-semibold text-slate-300 transition-all active:scale-95">
+                        class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/5 hover:border-white/10 text-xs font-semibold text-slate-300 transition-all active:scale-95"
+                        data-i18n="btn_cancel">
                     Cancelar
                 </button>
                 <button onclick="confirmFolderSelection();" 
                         class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-xs font-semibold text-white tracking-wide shadow-lg shadow-violet-600/20 active:scale-95 transition-all flex items-center gap-1.5">
-                    <i class="fa-solid fa-circle-check"></i> Seleccionar Carpeta
+                    <i class="fa-solid fa-circle-check"></i> <span data-i18n="web_select_folder">Seleccionar Carpeta</span>
                 </button>
             </div>
         </div>
@@ -389,21 +436,23 @@
                     <i class="fa-solid fa-folder-plus"></i>
                 </div>
                 <div>
-                    <h3 class="text-sm font-bold text-white font-outfit">Nueva Carpeta</h3>
-                    <p class="text-[10px] text-slate-400">Ingresa el nombre del nuevo directorio</p>
+                    <h3 class="text-sm font-bold text-white font-outfit" data-i18n="web_new_folder_title">Nueva Carpeta</h3>
+                    <p class="text-[10px] text-slate-400" data-i18n="web_new_folder_subtitle">Ingresa el nombre del nuevo directorio</p>
                 </div>
             </div>
             <div>
-                <input type="text" id="new-folder-name" required placeholder="Nombre de la carpeta..."
+                <input type="text" id="new-folder-name" required placeholder="Nombre de la carpeta..." data-i18n="web_new_folder_placeholder"
                        class="w-full px-3 py-2.5 bg-slate-950/80 border border-white/10 rounded-lg text-xs focus:outline-none focus:border-emerald-500 text-slate-200 font-medium">
             </div>
             <div class="flex items-center justify-end gap-3 pt-2">
                 <button onclick="closeNewFolderPrompt();" 
-                        class="px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 transition-all">
+                        class="px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 transition-all"
+                        data-i18n="btn_cancel">
                     Cancelar
                 </button>
                 <button onclick="submitNewFolder();" 
-                        class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white transition-all">
+                        class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white transition-all"
+                        data-i18n="web_create">
                     Crear
                 </button>
             </div>
@@ -418,17 +467,19 @@
                     <i id="confirm-modal-icon" class="fa-solid fa-triangle-exclamation text-lg"></i>
                 </div>
                 <div class="space-y-1">
-                    <h3 id="confirm-modal-title" class="text-md font-bold text-white font-outfit">Confirmar Acción</h3>
+                    <h3 id="confirm-modal-title" class="text-md font-bold text-white font-outfit" data-i18n="web_confirm_title">Confirmar Acción</h3>
                     <p id="confirm-modal-message" class="text-xs text-slate-300 leading-relaxed"></p>
                 </div>
             </div>
             <div class="flex items-center justify-end gap-3 pt-2">
                 <button id="btn-confirm-cancel" onclick="closeConfirmModal();" 
-                        class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 transition-all active:scale-95">
+                        class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 transition-all active:scale-95"
+                        data-i18n="btn_cancel">
                     Cancelar
                 </button>
                 <button id="btn-confirm-ok" 
-                        class="px-4 py-2 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-xs font-semibold text-white transition-all active:scale-95">
+                        class="px-4 py-2 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-xs font-semibold text-white transition-all active:scale-95"
+                        data-i18n="msg_confirm">
                     Confirmar
                 </button>
             </div>

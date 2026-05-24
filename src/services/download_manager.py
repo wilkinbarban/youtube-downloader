@@ -55,9 +55,15 @@ class DownloadManager:
         self._summary_callbacks.append(cb)
 
     def enqueue_task(self, task: VideoDownloadTask):
+        self.enqueue_tasks([task])
+
+    def enqueue_tasks(self, tasks: list[VideoDownloadTask]):
+        if not tasks:
+            return
         with self.state_lock:
-            self.download_queue.put(task)
-            self.pending_downloads.append(task)
+            for task in tasks:
+                self.download_queue.put(task)
+                self.pending_downloads.append(task)
         self._notify_state_changed()
 
     def toggle_pause(self):
@@ -155,26 +161,27 @@ class DownloadManager:
 
     def _process_queue_loop(self):
         while True:
-            time.sleep(1)
+            processed_item = False
+            task_to_start = None
             with self.state_lock:
-                if self.paused:
-                    continue
-                active_count = len(self.active_downloads)
-                
-            if active_count >= 3:
-                continue
-                
-            try:
-                task = self.download_queue.get_nowait()
-            except Empty:
-                continue
-                
-            if isinstance(task, VideoDownloadTask):
-                with self.state_lock:
-                    if task not in self.pending_downloads:
-                        continue
-                    self.pending_downloads.remove(task)
-                self.start_download(task)
+                if not self.paused and len(self.active_downloads) < 3:
+                    try:
+                        task = self.download_queue.get_nowait()
+                        processed_item = True
+                        if isinstance(task, VideoDownloadTask):
+                            if task in self.pending_downloads:
+                                self.pending_downloads.remove(task)
+                                task_to_start = task
+                    except Empty:
+                        pass
+            
+            if task_to_start:
+                self.start_download(task_to_start)
+                time.sleep(0.01)
+            elif processed_item:
+                time.sleep(0.01)
+            else:
+                time.sleep(0.5)
 
     def start_download(self, task: VideoDownloadTask):
         config = Config.load()

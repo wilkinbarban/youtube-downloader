@@ -961,6 +961,7 @@ class MainWindow(QMainWindow):
 
     def _enqueue_playlist_tasks(self, videos, quality):
         playlist_id = f"playlist_{int(time.time())}"
+        tasks = []
         for video in videos:
             task = VideoDownloadTask(
                 url=video["url"],
@@ -968,7 +969,8 @@ class MainWindow(QMainWindow):
                 quality=quality,
                 playlist_id=playlist_id,
             )
-            self.manager.enqueue_task(task)
+            tasks.append(task)
+        self.manager.enqueue_tasks(tasks)
         return len(videos)
 
     def _enqueue_single_video(self, url, quality, source_label):
