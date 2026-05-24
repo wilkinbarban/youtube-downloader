@@ -40,7 +40,7 @@ jobs:
 
       - name: Build executable
         run: |
-          pyinstaller --noconfirm --clean --windowed --onefile --paths "." --name YouTubeDownloader --icon assets/icon.ico --add-data "assets;assets" --add-data "build-resources/ffmpeg;ffmpeg" src/main/youtube_downloader.py
+          pyinstaller --noconfirm --clean --windowed --onefile --paths "." --name YouTubeDownloader --icon assets/icon.ico --add-data "assets;assets" --add-data "src/web/static;src/web/static" --add-data "build-resources/ffmpeg;ffmpeg" src/main/youtube_downloader.py
 
       - name: Upload workflow artifact
         uses: actions/upload-artifact@v4
