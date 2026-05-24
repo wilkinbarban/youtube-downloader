@@ -227,26 +227,43 @@
                                 </select>
                             </div>
                         </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Cookies de Navegador (Bypass Bot)</label>
-                            <select id="setting-cookies" 
-                                    class="w-full px-3 py-2.5 bg-slate-900/50 border border-white/10 rounded-lg text-xs focus:outline-none focus:border-violet-500 transition-all text-white font-medium cursor-pointer">
-                                <option value="none">Ninguno (None)</option>
-                                <option value="chrome">Chrome</option>
-                                <option value="firefox">Firefox</option>
-                                <option value="edge">Edge</option>
-                                <option value="brave">Brave</option>
-                                <option value="opera">Opera</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Archivo de Cookies Local (cookies.txt / cookies.json)</label>
-                            <div class="flex items-center gap-3">
-                                <label class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-lg border border-white/10 cursor-pointer text-white transition-all flex items-center gap-1.5">
-                                    <i class="fa-solid fa-file-import"></i> Seleccionar archivo...
+                        <!-- Cookies / Bot Bypass section styled beautifully -->
+                        <div class="p-4 rounded-2xl bg-violet-950/10 border border-violet-500/20 space-y-4">
+                            <div class="flex items-center gap-2">
+                                <div class="w-6 h-6 rounded-lg bg-violet-600/20 border border-violet-500/30 flex items-center justify-center text-violet-400">
+                                    <i class="fa-solid fa-cookie-bite text-xs"></i>
+                                </div>
+                                <h3 class="text-xs font-bold text-white uppercase tracking-wider">Bypass de Bot (Cookies)</h3>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Cookies de Navegador</label>
+                                <div class="relative">
+                                    <select id="setting-cookies" 
+                                            class="w-full px-3 py-2 bg-slate-900/50 border border-white/10 rounded-lg text-xs focus:outline-none focus:border-violet-500 transition-all text-white font-medium cursor-pointer appearance-none">
+                                        <option value="none">Ninguno (None)</option>
+                                        <option value="chrome">Chrome</option>
+                                        <option value="firefox">Firefox</option>
+                                        <option value="edge">Edge</option>
+                                        <option value="brave">Brave</option>
+                                        <option value="opera">Opera</option>
+                                    </select>
+                                    <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-slate-400 text-[10px]">
+                                        <i class="fa-solid fa-chevron-down"></i>
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Archivo de Cookies Local (cookies.txt / cookies.json)</label>
+                                <!-- Drag and Drop Cookie Upload Zone -->
+                                <div id="cookie-drop-zone" class="border border-dashed border-violet-500/30 rounded-xl p-4 bg-slate-900/20 hover:bg-slate-900/40 hover:border-violet-500/60 transition-all duration-300 flex flex-col items-center justify-center gap-2 cursor-pointer">
+                                    <i id="cookie-upload-icon" class="fa-solid fa-cloud-arrow-up text-xl text-violet-400"></i>
+                                    <span class="text-xs font-semibold text-slate-200 text-center">Importar cookies.txt / cookies.json</span>
+                                    <span class="text-[9px] text-slate-500 text-center">Arrastra el archivo aquí o haz clic para buscar</span>
+                                    <span id="cookie-file-status" class="text-[10px] text-slate-400 font-semibold mt-1">Cargando estado...</span>
                                     <input type="file" id="cookie-file-input" class="hidden" accept=".json,.txt" onchange="uploadCookieFile()">
-                                </label>
-                                <span id="cookie-file-status" class="text-xs text-slate-400 font-medium">Cargando estado...</span>
+                                </div>
                             </div>
                         </div>
                         <div class="flex items-center justify-between pt-2">
@@ -393,7 +410,32 @@
         </div>
     </div>
 
+    <!-- Custom Confirmation Modal -->
+    <div id="confirm-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-md opacity-0 pointer-events-none transition-all duration-300">
+        <div class="glass-card w-full max-w-sm mx-4 p-6 border border-white/10 bg-[#0c0f1d]/95 shadow-2xl space-y-4 transform scale-95 transition-transform duration-300">
+            <div class="flex items-start gap-4">
+                <div id="confirm-modal-icon-bg" class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+                    <i id="confirm-modal-icon" class="fa-solid fa-triangle-exclamation text-lg"></i>
+                </div>
+                <div class="space-y-1">
+                    <h3 id="confirm-modal-title" class="text-md font-bold text-white font-outfit">Confirmar Acción</h3>
+                    <p id="confirm-modal-message" class="text-xs text-slate-300 leading-relaxed"></p>
+                </div>
+            </div>
+            <div class="flex items-center justify-end gap-3 pt-2">
+                <button id="btn-confirm-cancel" onclick="closeConfirmModal();" 
+                        class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 transition-all active:scale-95">
+                    Cancelar
+                </button>
+                <button id="btn-confirm-ok" 
+                        class="px-4 py-2 rounded-lg bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-xs font-semibold text-white transition-all active:scale-95">
+                    Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Web App JS Logic -->
-    <script src="app.js"></script>
+    <script src="app.js" defer></script>
 </body>
 </html>

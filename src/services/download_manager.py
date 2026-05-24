@@ -2,6 +2,7 @@ import threading
 import time
 from queue import Queue, Empty
 from datetime import datetime
+import uuid
 
 from src.modules.core import VideoDownloadTask, Config
 from src.services.workers import DownloadWorker
@@ -184,7 +185,7 @@ class DownloadManager:
             config.get("format", "mp4"),
             config.get("language", "es")
         )
-        worker_id = f"{task.url}_{time.time()}"
+        worker_id = f"worker_{uuid.uuid4().hex}"
         
         task.state = "descargando"
         task.start_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")

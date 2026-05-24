@@ -186,7 +186,7 @@ function updateUI(state) {
         </div>
 
         <!-- Progress Bar -->
-        <div class="w-full h-2 bg-slate-955/40 rounded-full overflow-hidden mb-3">
+        <div class="w-full h-2 bg-slate-950/40 rounded-full overflow-hidden mb-3">
             <div id="${workerId}-bar" class="h-full progress-fill" style="width: ${percent}%"></div>
         </div>
 
@@ -211,7 +211,7 @@ function updateUI(state) {
 
 function createPendingCard(task, index) {
     const card = document.createElement('div');
-    card.className = 'glass-card p-4 download-card border-l-4 border-l-purple-500/40 bg-slate-955/10 animate-slide-in';
+    card.className = 'glass-card p-4 download-card border-l-4 border-l-purple-500/40 bg-slate-950/10 animate-slide-in';
 
     card.innerHTML = `
         <div class="flex items-center justify-between gap-4">
@@ -239,7 +239,7 @@ function createPendingCard(task, index) {
 }
 
 async function cancelActiveWorker(workerId) {
-    if (!confirm('¿Cancelar esta descarga?')) return;
+    if (!await showConfirm('¿Cancelar Descarga?', '¿Estás seguro de que deseas cancelar esta descarga activa?', 'warning')) return;
     try {
         const response = await fetch(`/api/downloads/${encodeURIComponent(workerId)}/cancel`, { method: 'POST' });
         const res = await response.json();
@@ -257,7 +257,7 @@ async function cancelActiveWorker(workerId) {
 }
 
 async function removePendingTask(url) {
-    if (!confirm('¿Eliminar esta tarea de la cola?')) return;
+    if (!await showConfirm('¿Quitar de la Cola?', '¿Estás seguro de que deseas eliminar esta tarea de la cola de pendientes?', 'warning')) return;
     try {
         const response = await fetch('/api/downloads/remove-pending', {
             method: 'POST',
@@ -457,7 +457,7 @@ async function togglePauseQueue() {
 }
 
 async function cancelAllDownloads() {
-    if (!confirm('¿Estás seguro de que quieres cancelar todas las descargas activas?')) return;
+    if (!await showConfirm('¿Cancelar Todo?', '¿Estás seguro de que deseas cancelar todas las descargas activas?', 'error')) return;
     try {
         const response = await fetch('/api/downloads/cancel', { method: 'POST' });
         const res = await response.json();
@@ -488,7 +488,7 @@ async function clearHistory() {
 }
 
 async function clearQueue() {
-    if (!confirm('¿Cancelar todas las descargas activas y vaciar la cola de pendientes?')) return;
+    if (!await showConfirm('¿Limpiar Lista?', '¿Cancelar todas las descargas activas y vaciar la cola de pendientes?', 'error')) return;
     try {
         const response = await fetch('/api/downloads/clear-queue', { method: 'POST' });
         const res = await response.json();
@@ -800,6 +800,52 @@ async function saveSettings() {
     }
 }
 
+// Custom Confirmation Modal Logic
+let confirmPromiseResolve = null;
+
+function showConfirm(title, message, iconType = 'warning') {
+    const modal = document.getElementById('confirm-modal');
+    const titleEl = document.getElementById('confirm-modal-title');
+    const messageEl = document.getElementById('confirm-modal-message');
+    const iconEl = document.getElementById('confirm-modal-icon');
+    const iconBg = document.getElementById('confirm-modal-icon-bg');
+    
+    titleEl.textContent = title;
+    messageEl.textContent = message;
+    
+    // Icon and colors
+    iconBg.className = 'w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border';
+    if (iconType === 'error') {
+        iconBg.classList.add('bg-rose-500/20', 'border-rose-500/30', 'text-rose-400');
+        iconEl.className = 'fa-solid fa-ban text-lg';
+    } else if (iconType === 'info') {
+        iconBg.classList.add('bg-blue-500/20', 'border-blue-500/30', 'text-blue-400');
+        iconEl.className = 'fa-solid fa-circle-info text-lg';
+    } else { // warning
+        iconBg.classList.add('bg-amber-500/20', 'border-amber-500/30', 'text-amber-400');
+        iconEl.className = 'fa-solid fa-triangle-exclamation text-lg';
+    }
+    
+    modal.classList.add('modal-active');
+    
+    return new Promise((resolve) => {
+        confirmPromiseResolve = resolve;
+    });
+}
+
+function handleConfirmResult(value) {
+    const modal = document.getElementById('confirm-modal');
+    modal.classList.remove('modal-active');
+    if (confirmPromiseResolve) {
+        confirmPromiseResolve(value);
+        confirmPromiseResolve = null;
+    }
+}
+
+function closeConfirmModal() {
+    handleConfirmResult(false);
+}
+
 // Fetch logs and output to terminal log box
 async function fetchLogs() {
     const terminal = document.getElementById('terminal-logs');
@@ -825,6 +871,42 @@ window.addEventListener('DOMContentLoaded', () => {
     pollState();
     connectWebSocket();
     updateCookiesStatus();
+    
+    // Setup confirm modal action listener
+    const btnConfirmOk = document.getElementById('btn-confirm-ok');
+    if (btnConfirmOk) {
+        btnConfirmOk.addEventListener('click', () => handleConfirmResult(true));
+    }
+    
+    // Setup Drag & Drop Cookie Upload Zone
+    const dropZone = document.getElementById('cookie-drop-zone');
+    if (dropZone) {
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.classList.add('dragover');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.classList.remove('dragover');
+            }, false);
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files && files.length > 0) {
+                const fileInput = document.getElementById('cookie-file-input');
+                fileInput.files = files; // Assign files to input
+                uploadCookieFile(); // Trigger upload
+            }
+        }, false);
+    }
     
     // Fetch logs every 5 seconds
     fetchLogs();
