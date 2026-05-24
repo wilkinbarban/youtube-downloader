@@ -356,18 +356,16 @@ function handleConnectionDrop() {
 // Real-time progress updater for active downloads (avoids full list redrawing)
 function updateTaskProgress(workerId, progress) {
     const bar = document.getElementById(`${workerId}-bar`);
+    if (!bar) {
+        // Card might not exist in the DOM yet, ignore this tick
+        return;
+    }
     const percentEl = document.getElementById(`${workerId}-percent`);
     const statusEl = document.getElementById(`${workerId}-status`);
     const downloadedEl = document.getElementById(`${workerId}-downloaded`);
     const totalEl = document.getElementById(`${workerId}-total`);
     const speedEl = document.getElementById(`${workerId}-speed`);
     const etaEl = document.getElementById(`${workerId}-eta`);
-
-    if (!bar) {
-        // Card might not exist yet, poll to refresh full UI
-        pollState();
-        return;
-    }
 
     const percent = parseFloat(progress.percent || 0).toFixed(1);
     bar.style.width = `${percent}%`;
