@@ -65,6 +65,7 @@ Aplicación de escritorio para Windows creada con Python y PyQt6 para gestionar 
 ### Características
 - Descarga de videos individuales, playlists y extracción de audio.
 - Hasta 3 descargas simultáneas.
+- **Gestor Asíncrono Web**: interfaz web moderna (FastAPI + WebSockets) accesible en `http://127.0.0.1:8000` con progreso en tiempo real y controles remotos.
 - Monitor automático del portapapeles para detectar enlaces de YouTube.
 - Historial de resultados y panel de logs.
 - Interfaz multilenguaje: Español, English y Português (Brasil).
@@ -115,6 +116,19 @@ En la barra de menú, ve a **Ayuda > Ayuda al proyecto**.
 
 Tu apoyo ayuda a mantener mejoras, correcciones y nuevas funciones.
 
+### Gestión de Cookies y Bypass de Bot (Evitar "Confirm you're not a bot")
+Para evitar el bloqueo de YouTube con errores de tráfico automatizado, la aplicación cuenta con un sistema integrado de autenticación mediante cookies que funciona tanto en la interfaz de escritorio como en la web:
+
+1. **Cookies de Navegador (Automático)**:
+   - En **Configuración** (o en los ajustes del Gestor Web), puedes seleccionar tu navegador habitual (Chrome, Firefox, Edge, Brave u Opera). La aplicación extraerá automáticamente las cookies de sesión activa para autenticar las peticiones ante YouTube.
+   - *Nota en Windows*: Si usas Chrome o Edge, Windows bloquea su base de datos de cookies si el navegador está abierto. Si obtienes el error *"Could not copy Chrome cookie database"*, debes cerrar el navegador por completo o usar el método de archivo local (`cookies.txt`).
+2. **Archivo Local (`cookies.txt` / `cookies.json`)**:
+   - Si prefieres no usar cookies del navegador o tienes el navegador abierto, puedes importar un archivo de cookies.
+   - **Formatos soportados**: Netscape (`cookies.txt`) o JSON (`cookies.json`) exportados mediante extensiones del navegador (como *Get cookies.txt LOCALLY* o *EditThisCookie*).
+   - **En la Interfaz de Escritorio**: Ve a **Herramientas > Configuración**, en la sección *Autenticación y Cookies*, haz clic en **Importar cookies...** para seleccionar tu archivo. Si es un JSON, la app lo convertirá automáticamente a formato Netscape.
+   - **En la Interfaz Web**: Abre el Gestor Web, ve a la sección de configuración en la parte inferior, y arrastra o selecciona tu archivo en el panel de carga de cookies. Se procesará y convertirá en el servidor de fondo.
+   - Si existe un archivo `cookies.txt` en la raíz del proyecto, este tendrá prioridad absoluta sobre la extracción del navegador.
+
 ---
 
 ## English
@@ -125,6 +139,7 @@ Windows desktop application built with Python and PyQt6 to manage YouTube downlo
 ### Features
 - Download single videos, playlists, and extract audio.
 - Up to 3 concurrent downloads.
+- **Asynchronous Web Manager**: modern web interface (FastAPI + WebSockets) accessible at `http://127.0.0.1:8000` with real-time progress and remote controls.
 - Automatic clipboard monitor for YouTube links.
 - Download history and logs panel.
 - Multilingual interface: Español, English, and Português (Brasil).
@@ -175,6 +190,19 @@ In the menu bar, go to **Help > Support the project**.
 
 Your support helps maintain improvements, fixes, and new features.
 
+### Cookie Management and Bot Bypass (Avoid "Confirm you're not a bot")
+To avoid YouTube blocks with automated traffic errors, the app includes an integrated cookie authentication system for both desktop and web interfaces:
+
+1. **Browser Cookies (Automatic)**:
+   - In **Settings** (or in the Web Manager's preferences), you can select your active browser (Chrome, Firefox, Edge, Brave, or Opera). The app will automatically extract active session cookies to authenticate requests.
+   - *Windows Note*: If using Chrome or Edge, Windows locks their cookie database while the browser is running. If you get the error *"Could not copy Chrome cookie database"*, close the browser completely or use the local file method (`cookies.txt`).
+2. **Local File (`cookies.txt` / `cookies.json`)**:
+   - If you prefer not to read directly from the browser or want to keep it open, you can import a cookies file.
+   - **Supported formats**: Netscape (`cookies.txt`) or JSON (`cookies.json`) exported via browser extensions (such as *Get cookies.txt LOCALLY* or *EditThisCookie*).
+   - **On the Desktop UI**: Go to **Tools > Settings**, under *Authentication & Cookies*, click **Import cookies...** to choose your file. JSON files are automatically converted on-the-fly to Netscape format.
+   - **On the Web UI**: Open the Web Manager, navigate to the settings section at the bottom, and upload or drag-and-drop your file in the cookies card. The backend will parse and convert it automatically.
+   - If a `cookies.txt` file exists in the project root folder, it takes absolute precedence over browser-based extraction.
+
 ---
 
 ## Português (Brasil)
@@ -185,6 +213,7 @@ Aplicativo desktop para Windows, desenvolvido com Python e PyQt6, para gerenciar
 ### Recursos
 - Download de vídeos individuais, playlists e extração de áudio.
 - Até 3 downloads simultâneos.
+- **Gerenciador Web Assíncrono**: interface web moderna (FastAPI + WebSockets) acessível em `http://127.0.0.1:8000` com progresso em tempo real e controles remotos.
 - Monitor automático da área de transferência para links do YouTube.
 - Histórico de downloads e painel de logs.
 - Interface multilíngue: Español, English e Português (Brasil).
@@ -235,6 +264,19 @@ Na barra de menu, acesse **Ajuda > Apoiar o projeto**.
 
 Seu apoio ajuda a manter melhorias, correções e novos recursos.
 
+### Gerenciamento de Cookies e Bypass de Bot (Evitar "Confirm you're not a bot")
+Para evitar bloqueios do YouTube com erros de tráfego automatizado, o aplicativo inclui um sistema integrado de autenticação por cookies que funciona tanto na interface desktop quanto na web:
+
+1. **Cookies do Navegador (Automático)**:
+   - Em **Configurações** (ou nas preferências do Gerenciador Web), você pode selecionar seu navegador padrão (Chrome, Firefox, Edge, Brave ou Opera). O aplicativo extrairá automaticamente os cookies da sessão ativa para autenticar as requisições no YouTube.
+   - *Nota no Windows*: Se usar Chrome ou Edge, o Windows bloqueia o banco de dados de cookies enquanto o navegador estiver aberto. Se receber o erro *"Could not copy Chrome cookie database"*, feche o navegador completamente ou use o método de arquivo local (`cookies.txt`).
+2. **Arquivo Local (`cookies.txt` / `cookies.json`)**:
+   - Se preferir não ler diretamente do navegador ou se quiser mantê-lo aberto, você pode importar um arquivo de cookies.
+   - **Formatos suportados**: Netscape (`cookies.txt`) o JSON (`cookies.json`) exportados por extensões do navegador (como *Get cookies.txt LOCALLY* ou *EditThisCookie*).
+   - **Na Interface Desktop**: Acesse **Ferramentas > Configuração**, na seção *Autenticación y Cookies* (Autenticação e Cookies), clique em **Importar cookies...** para selecionar o arquivo. Se for JSON, o app o converterá automaticamente para o formato Netscape.
+   - **Na Interface Web**: Abra o Gerenciador Web, vá para a seção de configurações na parte inferior e envie ou arraste seu arquivo no painel de carregamento de cookies. O backend o processará e converterá no servidor.
+   - Se existir um arquivo `cookies.txt` na raiz do projeto, ele terá prioridade absoluta sobre a extração do navegador.
+
 ---
 
 ## Project structure
@@ -245,14 +287,15 @@ Seu apoio ajuda a manter melhorias, correções e novos recursos.
 | `src/main/` | Main entrypoint and app bootstrap |
 | `src/modules/` | Domain and UI modules |
 | `src/services/` | Runtime services (workers, dependency orchestration) |
+| `src/web/` | FastAPI Web Manager server & static files (Cyberpunk/Nebula UI) |
 | `src/constants.py` | Single source of truth for application version |
 | `src/services/update_service.py` | Manual update-check service (GitHub Releases + semantic version comparison) |
 | `src/config/` | Shared configuration modules (paths, i18n) |
-| `src/utils/` | Shared utility modules (logging, helpers) |
+| `src/utils/` | Shared utility modules (logging, helpers, errors) |
 | `src/main/youtube_downloader.py` | Canonical application entry point |
 | `src/modules/ui/main_window.py` | Main UI orchestration and download queue |
 | `src/modules/core.py` | Domain logic, config, URL utilities |
-| `src/services/workers.py` | Background workers (downloads, playlist extraction, clipboard monitor) |
+| `src/services/workers.py` | Background workers (downloads, playlist extraction, clipboard monitor, FastAPI server worker) |
 | `src/services/dependencies.py` | Dependency checks and auto-installers |
 | `src/modules/ui/dialogs.py` | Settings, dependencies, support and help dialogs |
 | `src/config/i18n.py` | Multilingual string translations (ES / EN / PT-BR) |
